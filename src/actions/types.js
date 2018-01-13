@@ -4,3 +4,4 @@
  */
 export const GET_LOCATIONS = "get_locations";
 export const GET_LOCATIONS_FAIL = "get_locations_fail";
+export const CREATE_LOCATION = "create_location";

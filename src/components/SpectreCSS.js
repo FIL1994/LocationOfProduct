@@ -27,7 +27,7 @@ function addClass(defaultClass, newClass) {
  * @constructor
  */
 let Button = (props) => {
-  const {small, large, block, primary, centered, disabled} = props;
+  const {small, large, block, primary, centered, disabled, success, error} = props;
   let className = "btn";
   let otherProps = {};
 
@@ -50,6 +50,14 @@ let Button = (props) => {
     className = addClass(className, "btn-primary");
   }
 
+  if(success) {
+    className = addClass(className, "btn-success");
+  }
+
+  if(error) {
+    className = addClass(className, "btn-error");
+  }
+
   if(centered) {
     className = addClass(className, "centered text-center");
   }
@@ -64,13 +72,30 @@ let Button = (props) => {
   className = addClass(className, props.className);
 
   // remove unnecessary props
-  let myProps = _.omit(props, ['small', 'large', 'block', 'primary', 'centered', 'disabled', 'as']);
+  let myProps = _.omit(props, ['small', 'large', 'block', 'primary', 'centered', 'disabled', 'as', 'success', 'error']);
 
   return <props.as {...myProps} {...otherProps} className={className}/>;
 };
 
 Button.defaultProps = {
   as: (props) => <button type="button" {...props}/> // type defaults to "button" if no component is provided in props
+};
+
+Button.Group = (props) => {
+  const {block} = props;
+  let className = "btn-group";
+
+  if(block) {
+    className = addClass(className, "btn-group-block");
+  }
+
+  // add the className prop to the className
+  className = addClass(className, props.className);
+
+  // remove unnecessary props
+  let myProps = _.omit(props, ['block']);
+
+  return <div {...myProps} className={className} />;
 };
 
 export {Button};
@@ -160,6 +185,9 @@ const Table = (props) => {
     className = addClass(className, "text-center")
   }
 
+  // add the className prop to the className
+  className = addClass(className, props.className);
+
   // remove unnecessary props
   let myProps = _.omit(props, ['striped', 'hover', 'centered']);
 
@@ -169,17 +197,28 @@ const Table = (props) => {
 Table.Head = (props) => {
   const {headings} = props;
 
+  // remove unnecessary props
+  let myProps = _.omit(props, ['headings']);
+
   return (
-    <thead>
-    <tr>
-      {headings.map(h => <th key={h}>{h}</th>)}
-    </tr>
+    <thead {...myProps}>
+      <tr>
+        {headings.map(h => <th key={h}>{h}</th>)}
+      </tr>
     </thead>
   );
 };
 
 Table.Head.propTypes = {
   headings: PropTypes.array.isRequired
+};
+
+Table.Body = (props) => {
+  return <tbody {...props}/>;
+};
+
+Table.Row = (props) => {
+  return <tr {...props}/>;
 };
 
 export {Table};

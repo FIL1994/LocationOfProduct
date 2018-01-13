@@ -3,10 +3,11 @@
  * @date 2018-01-13
  */
 import React, {Component, Fragment} from 'react';
+import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import _ from 'lodash';
 
-import {EmptyState, Loading, Table, TableHeading} from './SpectreCSS';
+import {Button, EmptyState, Loading, Table} from './SpectreCSS';
 import {getLocations} from '../actions';
 
 class LocationsShow extends Component {
@@ -16,7 +17,6 @@ class LocationsShow extends Component {
 
   renderLocations() {
     const {locations} = this.props;
-    console.log(locations);
 
     // handle if locations is empty
     if(_.isEmpty(locations)) {
@@ -35,6 +35,20 @@ class LocationsShow extends Component {
     return(
       <Table striped hover>
         <Table.Head headings={["id", "description", "datetime", "longitude", "latitude", "elevation"]}/>
+        <Table.Body>
+          {
+            locations.map(({_key: key, description, datetime, longitude, latitude, elevation}) =>
+              <tr key={key}>
+                <td>{key}</td>
+                <td>{description}</td>
+                <td>{datetime}</td>
+                <td>{longitude}</td>
+                <td>{latitude}</td>
+                <td>{elevation}</td>
+              </tr>
+            )
+          }
+        </Table.Body>
       </Table>
     );
   }
@@ -42,7 +56,12 @@ class LocationsShow extends Component {
   render() {
     return(
       <Fragment>
-        <h3>Locations</h3>
+        <div>
+          <h3 className="float-left">Locations</h3>
+          <Button as={Link} to={"/post"} primary className="float-right">
+            Add Location
+          </Button>
+        </div>
         {this.renderLocations()}
       </Fragment>
     );
