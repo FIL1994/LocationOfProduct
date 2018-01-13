@@ -3,12 +3,12 @@
  * @date 2018-01-13
  */
 import React, {Component} from 'react';
-import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {Field, reduxForm} from 'redux-form';
+import {reduxForm} from 'redux-form';
 
-import {Page, Button} from '../SpectreCSS';
+import {Page} from '../SpectreCSS';
 import {createLocation} from '../../actions';
+import LocationForm from '../LocationForm';
 
 class CreateLocation extends Component {
   constructor(props) {
@@ -21,25 +21,6 @@ class CreateLocation extends Component {
     this.onSubmit = this.onSubmit.bind(this);
   }
 
-  renderField(field) {
-    const {meta : {touched, error}} = field;
-    const className=`form-group ${touched && error ? 'has-error' : ''}`;
-    return(
-      <div className={className}>
-        <label htmlFor={field.input.name}>{field.label}</label>
-        <input
-          className="form-input"
-          id={field.input.name}
-          placeholder={field.input.name}
-          {...field.input}
-        />
-        <div className="form-input-hint">
-          {touched ? error : ''}
-        </div>
-      </div>
-    );
-  }
-
   onSubmit(values) {
     this.setState({submittingPost: true});
 
@@ -49,41 +30,7 @@ class CreateLocation extends Component {
   render() {
     return (
       <Page centered>
-        <form onSubmit={this.props.handleSubmit(this.onSubmit)}>
-          <Field
-            label="Description: "
-            name="description"
-            component={this.renderField}
-          />
-          <Field
-            label="Longitude: "
-            name="longitude"
-            component={this.renderField}
-          />
-          <Field
-            label="Latitude: "
-            name="latitude"
-            component={this.renderField}
-          />
-          <Field
-            label="Elevation: "
-            name="elevation"
-            component={this.renderField}
-          />
-          <Field
-            label="Datetime: "
-            name="datetime"
-            component={this.renderField}
-          />
-          <Button.Group block>
-            <Button type="submit" primary loading={this.state.submittingPost}>
-              Submit
-            </Button>
-            <Button as={Link} to="/" error>
-              Cancel
-            </Button>
-          </Button.Group>
-        </form>
+        <LocationForm onSubmit={this.props.handleSubmit(this.onSubmit)} submittingPost={this.state.submittingPost}/>
       </Page>
     );
   }

@@ -3,7 +3,7 @@
  * @date 2018-01-13
  */
 import axios from 'axios';
-import {GET_LOCATIONS, GET_LOCATIONS_FAIL, CREATE_LOCATION, EDIT_LOCATION, GET_LOCATION, GET_LOCATION_FAIL}
+import {GET_LOCATIONS, FAIL_LOCATIONS, CREATE_LOCATION, EDIT_LOCATION, GET_LOCATION, FAIL_LOCATION}
   from './types';
 
 //API Info
@@ -20,23 +20,26 @@ export function getLocations() {
         })
       ).catch(
         error => dispatch({
-          type: GET_LOCATIONS_FAIL,
+          type: FAIL_LOCATIONS,
           error
         })
     );
 }
 
 export function createLocation(values, callback) {
-  console.log(values);
-
-  /*
-  axios.post(ROOT_URL, values)
-    .then(response => callback(response));
-  */
-
-  return {
-    type: CREATE_LOCATION
-  };
+  return dispatch =>
+    axios.post(ROOT_URL, values)
+      .then(response => callback(response) &&
+        dispatch({
+          type: CREATE_LOCATION,
+          payload: response
+        })
+      ).catch(
+        error => callback(error) && dispatch({
+          type: FAIL_LOCATION,
+          error
+        })
+    );
 }
 // endregion
 
@@ -51,7 +54,23 @@ export function getLocation(id) {
         })
       ).catch(
       error => dispatch({
-        type: GET_LOCATION_FAIL,
+        type: FAIL_LOCATION,
+        error
+      })
+    );
+}
+
+export function editLocation(id, values, callback) {
+  return dispatch =>
+    axios.put(`${ROOT_URL}/${id}`, values)
+      .then(response => callback(response) &&
+        dispatch({
+          type: GET_LOCATION,
+          payload: response
+        })
+      ).catch(
+      error => callback(error) && dispatch({
+        type: FAIL_LOCATION,
         error
       })
     );
