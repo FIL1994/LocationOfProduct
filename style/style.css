@@ -1,0 +1,32 @@
+header {
+  margin-bottom: 5px;
+}
+
+footer {
+  margin-top: 5px;
+}
+
+body {
+  background-color: #f3f3f3;
+}
+
+.site {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.site-content {
+  flex: 1;
+}
+
+.page {
+  width: 95%;
+  margin-top: 10px;
+}
+
+.navbar-section .btn {
+  height: 100%;
+}
