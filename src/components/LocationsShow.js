@@ -34,7 +34,7 @@ class LocationsShow extends Component {
 
     return(
       <Table striped hover>
-        <Table.Head headings={["id", "description", "datetime", "longitude", "latitude", "elevation"]}/>
+        <Table.Head headings={["id", "description", "datetime", "longitude", "latitude", "elevation", "actions"]}/>
         <Table.Body>
           {
             locations.map(({_key: key, description, datetime, longitude, latitude, elevation}) =>
@@ -45,6 +45,16 @@ class LocationsShow extends Component {
                 <td>{longitude}</td>
                 <td>{latitude}</td>
                 <td>{elevation}</td>
+                <td>
+                  <Button.Group>
+                    <Button as={Link} to={`/edit/${key}`}>
+                      Edit
+                    </Button>
+                    <Button>
+                      Delete
+                    </Button>
+                  </Button.Group>
+                </td>
               </tr>
             )
           }

@@ -27,7 +27,7 @@ function addClass(defaultClass, newClass) {
  * @constructor
  */
 let Button = (props) => {
-  const {small, large, block, primary, centered, disabled, success, error} = props;
+  const {small, large, block, primary, centered, disabled, success, error, loading} = props;
   let className = "btn";
   let otherProps = {};
 
@@ -58,6 +58,10 @@ let Button = (props) => {
     className = addClass(className, "btn-error");
   }
 
+  if(loading) {
+    className = addClass(className, "loading");
+  }
+
   if(centered) {
     className = addClass(className, "centered text-center");
   }
@@ -72,7 +76,9 @@ let Button = (props) => {
   className = addClass(className, props.className);
 
   // remove unnecessary props
-  let myProps = _.omit(props, ['small', 'large', 'block', 'primary', 'centered', 'disabled', 'as', 'success', 'error']);
+  let myProps = _.omit(props,
+    ['small', 'large', 'block', 'primary', 'centered', 'disabled', 'as', 'success', 'error', 'loading']
+  );
 
   return <props.as {...myProps} {...otherProps} className={className}/>;
 };

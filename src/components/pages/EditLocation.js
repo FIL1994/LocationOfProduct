@@ -8,13 +8,22 @@ import {connect} from 'react-redux';
 import {Field, reduxForm} from 'redux-form';
 
 import {Page, Button} from '../SpectreCSS';
-import {createLocation} from '../../actions';
+import {getLocation, createLocation} from '../../actions';
 
-class Post extends Component {
+class EditLocation extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      submittingPost: false
+    };
+
     this.onSubmit = this.onSubmit.bind(this);
+  }
+
+  componentDidMount() {
+    const {id} = this.props.match.params;
+    this.props.getLocation(id);
   }
 
   renderField(field) {
@@ -37,7 +46,9 @@ class Post extends Component {
   }
 
   onSubmit(values) {
-    console.log(values);
+    this.setState({submittingPost: true});
+
+    this.props.createLocation(values, response => this.props.history.push('/'));
   }
 
   render() {
@@ -64,31 +75,57 @@ class Post extends Component {
             name="elevation"
             component={this.renderField}
           />
+          <Field
+            label="Datetime: "
+            name="datetime"
+            component={this.renderField}
+          />
+          <Button.Group block>
+            <Button type="submit" primary loading={this.state.submittingPost}>
+              Submit
+            </Button>
+            <Button as={Link} to="/" error>
+              Cancel
+            </Button>
+            <Button onClick={() => this.props.getLocation("120")}/>
+          </Button.Group>
         </form>
-        <Button.Group block>
-          <Button type="submit" primary>
-            Submit
-          </Button>
-          <Button as={Link} to="/" error>
-            Cancel
-          </Button>
-        </Button.Group>
       </Page>
     );
   }
 }
 
 function validate(values) {
-  console.log("values", values);
+  const {description, elevation, latitude, longitude} = values;
   let errors = {};
+
+  if(!description || description.length < 3) {
+    errors.description = "Enter a description that is at least 3 characters";
+  }
+  if(!elevation) {
+    errors.elevation = "Enter an elevation";
+  }
+  if(!latitude) {
+    errors.latitude = "Enter an latitude";
+  }
+  if(!longitude) {
+    errors.longitude = "Enter an longitude";
+  }
 
   return errors;
 }
 
-export default reduxForm({
+EditLocation = reduxForm({
   validate,
-  form: 'PostNewLocationForm'
-})(
-  connect(null, {createLocation})(Post)
-);
+  form: 'EditLocationForm',
+  enableReinitialize: true
+})(EditLocation);
 
+EditLocation = connect(
+  state => ({
+    initialValues: _.omit(state.location, ["_id", "_rev"])
+  }),
+  {getLocation, createLocation}
+)(EditLocation);
+
+export default EditLocation;

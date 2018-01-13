@@ -5,8 +5,10 @@
 import {combineReducers} from 'redux';
 import {reducer as formReducer} from 'redux-form';
 import locationsReducer from './locationsReducer';
+import locationReducer from './locationReducer';
 
 export default combineReducers({
   locations: locationsReducer,
+  location: locationReducer,
   form: formReducer
 });

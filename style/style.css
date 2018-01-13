@@ -4,6 +4,15 @@ header {
 
 footer {
   margin-top: 5px;
+  min-height: 80px;
+}
+
+footer a {
+  color: white;
+}
+
+footer a:hover {
+  color: #5f5dff;
 }
 
 body {
