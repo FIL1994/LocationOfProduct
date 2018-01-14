@@ -9,7 +9,7 @@ import {Button} from './SpectreCSS';
 
 function renderField(field) {
   const {meta : {touched, error}} = field;
-  const className=`form-group ${touched && error ? 'has-error' : ''}`;
+  const className = `form-group ${touched && error ? 'has-error' : ''}`;
   return(
     <div className={className}>
       <label htmlFor={field.input.name}>{field.label}</label>
@@ -61,6 +61,7 @@ export default (props) => {
             />
           </Fragment>
       }
+      {props.children}
       <Button.Group block>
         <Button type="submit" primary loading={props.submittingPost}>
           Submit

@@ -11,7 +11,8 @@ import {getProduct} from '../../actions';
 import {Loading, Page, Table, Tab} from '../SpectreCSS';
 
 const MyMap = withScriptjs(withGoogleMap((props) => {
-  const position={lat: Number(props.latitude), lng: Number(props.longitude)};
+  const {lat, lng} = props;
+  const position = {lat, lng};
 
     return(
       <GoogleMap
@@ -50,13 +51,13 @@ class ViewProduct extends Component {
 
   renderContent() {
     const {product} = this.props;
-    const {locations, datetime, description, elevation, latitude, longitude, _key} = product;
+    const {locations, _key} = product;
 
     switch(this.state.tab) {
       case "table":
         return(
           <Table centered striped hover>
-            <Table.Head headings={["datetime", "elevation", "latitude", "longitude"]}/>
+            <Table.Head headings={["Datetime", "Elevation", "Latitude", "Longitude"]}/>
             <thead>
             {
               locations.map(({datetime, elevation, latitude, longitude}, index) =>
@@ -72,12 +73,13 @@ class ViewProduct extends Component {
           </Table>
         );
       case "map":
+        const {latitude, longitude} = locations.slice(-1)[0];
         return(
           <MyMap
             key={_key}
             isMarkerShown
-            latitude={latitude}
-            longitude={longitude}
+            lat={Number(latitude)}
+            lng={Number(longitude)}
             positions={locations}
             googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=AIzaSyDqMPwl5XjyehPhDDkRx8wfO0pdtOxghng"
             loadingElement={<div style={{ height: `100%` }} />}
@@ -126,9 +128,7 @@ function mapStateToProps(state) {
 
   if(!_.isEmpty(product)) {
     return {
-      product:(
-        {...product, ...product.locations.slice(-1)[0]}
-      )
+      product
     };
   }
 

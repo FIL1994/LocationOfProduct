@@ -10,7 +10,7 @@ import {BrowserRouter, Switch, Route, Redirect} from 'react-router-dom';
 import HeaderNav from './HeaderNav';
 import Footer from './Footer';
 import Home from './pages/Home';
-import CreateProduct from './pages/CreateLocation';
+import CreateProduct from './pages/CreateProduct';
 import EditProduct from './pages/EditProduct';
 import ViewProduct from './pages/ViewProduct';
 
