@@ -2,7 +2,7 @@
  * @author Philip Van Raalte
  * @date 2018-01-13
  */
-import React from 'react';
+import React, {Fragment} from 'react';
 import {Link} from "react-router-dom";
 import {Field} from 'redux-form';
 import {Button} from './SpectreCSS';
@@ -27,33 +27,40 @@ function renderField(field) {
 }
 
 export default (props) => {
+  const {edit} = props;
+
   return(
-    <form {..._.omit(props, 'submittingPost')}>
+    <form {..._.omit(props, 'submittingPost', 'edit')}>
       <Field
         label="Description: "
         name="description"
         component={renderField}
       />
-      <Field
-        label="Longitude: "
-        name="longitude"
-        component={renderField}
-      />
-      <Field
-        label="Latitude: "
-        name="latitude"
-        component={renderField}
-      />
-      <Field
-        label="Elevation: "
-        name="elevation"
-        component={renderField}
-      />
-      <Field
-        label="Datetime: "
-        name="datetime"
-        component={renderField}
-      />
+      {
+        edit ? '' :
+          <Fragment>
+            <Field
+              label="Longitude: "
+              name="longitude"
+              component={renderField}
+            />
+            < Field
+            label="Latitude: "
+            name="latitude"
+            component={renderField}
+            />
+            <Field
+            label="Elevation: "
+            name="elevation"
+            component={renderField}
+            />
+            <Field
+            label="Datetime: "
+            name="datetime"
+            component={renderField}
+            />
+          </Fragment>
+      }
       <Button.Group block>
         <Button type="submit" primary loading={props.submittingPost}>
           Submit

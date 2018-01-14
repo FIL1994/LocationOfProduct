@@ -5,13 +5,13 @@
 import React, {Component} from 'react';
 
 import {Page} from '../SpectreCSS';
-import LocationsShow from '../LocationsShow';
+import ProductsShow from '../ProductsShow';
 
 class Home extends Component {
   render() {
     return(
       <Page centered>
-        <LocationsShow/>
+        <ProductsShow/>
       </Page>
     );
   }

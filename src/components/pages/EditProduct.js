@@ -7,10 +7,10 @@ import {connect} from 'react-redux';
 import {reduxForm} from 'redux-form';
 
 import {Page} from '../SpectreCSS';
-import {getLocation, editLocation} from '../../actions';
-import LocationForm from '../LocationForm';
+import {getProduct, editProduct} from '../../actions';
+import ProductForm from '../ProductForm';
 
-class EditLocation extends Component {
+class EditProduct extends Component {
   constructor(props) {
     super(props);
 
@@ -36,43 +36,34 @@ class EditLocation extends Component {
   render() {
     return (
       <Page centered>
-        <LocationForm onSubmit={this.props.handleSubmit(this.onSubmit)} submittingPost={this.state.submittingPost}/>
+        <ProductForm edit onSubmit={this.props.handleSubmit(this.onSubmit)} submittingPost={this.state.submittingPost}/>
       </Page>
     );
   }
 }
 
 function validate(values) {
-  const {description, elevation, latitude, longitude} = values;
+  const {description} = values;
   let errors = {};
 
   if(!description || description.length < 3) {
     errors.description = "Enter a description that is at least 3 characters";
   }
-  if(!elevation) {
-    errors.elevation = "Enter an elevation";
-  }
-  if(!latitude) {
-    errors.latitude = "Enter an latitude";
-  }
-  if(!longitude) {
-    errors.longitude = "Enter an longitude";
-  }
 
   return errors;
 }
 
-EditLocation = reduxForm({
+EditProduct = reduxForm({
   validate,
   form: 'EditLocationForm',
   enableReinitialize: true
-})(EditLocation);
+})(EditProduct);
 
-EditLocation = connect(
+EditProduct = connect(
   state => ({
-    initialValues: _.omit(state.location, ["_id", "_rev"])
+    initialValues: _.omit(state.product, ["_id", "_rev", "latitude", "longitude", "elevation"])
   }),
-  {getLocation, editLocation}
-)(EditLocation);
+  {getLocation: getProduct, editLocation: editProduct}
+)(EditProduct);
 
-export default EditLocation;
+export default EditProduct;

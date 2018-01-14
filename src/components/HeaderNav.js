@@ -24,7 +24,7 @@ class HeaderNav extends Component {
             Home
           </NavLink>
           <NavLink to="/post" className="btn btn-lg" activeClassName="btn-primary" isActive={this.isLinkActive}>
-            Add Location
+            Add Product
           </NavLink>
         </section>
       </header>

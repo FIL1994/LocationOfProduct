@@ -8,23 +8,23 @@ import {connect} from 'react-redux';
 import _ from 'lodash';
 
 import {Button, EmptyState, Loading, Table} from './SpectreCSS';
-import {getLocations} from '../actions';
+import {getProducts, deleteProduct} from '../actions';
 
-class LocationsShow extends Component {
+class ProductsShow extends Component {
   componentDidMount() {
     this.props.getLocations();
   }
 
   renderLocations() {
-    const {locations} = this.props;
+    const {products} = this.props;
 
-    // handle if locations is empty
-    if(_.isEmpty(locations)) {
-      if(_.isArray(locations)) {
-        // no locations are available
+    // handle if products is empty
+    if(_.isEmpty(products)) {
+      if(_.isArray(products)) {
+        // no products are available
         return(
           <EmptyState
-            title="No locations found."
+            title="No products found."
           />
         );
       }
@@ -33,11 +33,11 @@ class LocationsShow extends Component {
     }
 
     return(
-      <Table striped hover>
-        <Table.Head headings={["id", "description", "datetime", "longitude", "latitude", "elevation", "actions"]}/>
-        <Table.Body>
+      <Table centered striped hover>
+        <Table.Head headings={["ID", "Description", "Datetime", "Longitude", "Latitude", "Elevation", "Actions"]}/>
+        <thead>
           {
-            locations.map(({_key: key, description, datetime, longitude, latitude, elevation}) =>
+            products.map(({_key: key, description, datetime, longitude, latitude, elevation}) =>
               <tr key={key}>
                 <td>{key}</td>
                 <td>{description}</td>
@@ -47,10 +47,13 @@ class LocationsShow extends Component {
                 <td>{elevation}</td>
                 <td>
                   <Button.Group>
+                    <Button as={Link} to={`/location/${key}`}>
+                      View
+                    </Button>
                     <Button as={Link} to={`/edit/${key}`}>
                       Edit
                     </Button>
-                    <Button>
+                    <Button onClick={() => this.props.deleteLocation(key)}>
                       Delete
                     </Button>
                   </Button.Group>
@@ -58,7 +61,7 @@ class LocationsShow extends Component {
               </tr>
             )
           }
-        </Table.Body>
+        </thead>
       </Table>
     );
   }
@@ -66,12 +69,7 @@ class LocationsShow extends Component {
   render() {
     return(
       <Fragment>
-        <div>
-          <h3 className="float-left">Locations</h3>
-          <Button as={Link} to={"/post"} primary className="float-right">
-            Add Location
-          </Button>
-        </div>
+        <h3>Products</h3>
         {this.renderLocations()}
       </Fragment>
     );
@@ -79,9 +77,19 @@ class LocationsShow extends Component {
 }
 
 function mapStateToProps(state) {
+  const {products} = state;
+
+  if(_.isArray(products)) {
+    return {
+      products: products.map(p => (
+        {...p, ...p.locations.slice(-1)[0]}
+      ))
+    };
+  }
+
   return {
-    locations: state.locations
+    products
   };
 }
 
-export default connect(mapStateToProps, {getLocations})(LocationsShow);
+export default connect(mapStateToProps, {getLocations: getProducts, deleteLocation: deleteProduct})(ProductsShow);

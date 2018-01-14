@@ -7,10 +7,10 @@ import {connect} from 'react-redux';
 import {reduxForm} from 'redux-form';
 
 import {Page} from '../SpectreCSS';
-import {createLocation} from '../../actions';
-import LocationForm from '../LocationForm';
+import {createProducts} from '../../actions';
+import ProductForm from '../ProductForm';
 
-class CreateLocation extends Component {
+class CreateProduct extends Component {
   constructor(props) {
     super(props);
 
@@ -30,7 +30,7 @@ class CreateLocation extends Component {
   render() {
     return (
       <Page centered>
-        <LocationForm onSubmit={this.props.handleSubmit(this.onSubmit)} submittingPost={this.state.submittingPost}/>
+        <ProductForm onSubmit={this.props.handleSubmit(this.onSubmit)} submittingPost={this.state.submittingPost}/>
       </Page>
     );
   }
@@ -60,6 +60,6 @@ export default reduxForm({
   validate,
   form: 'NewLocationForm'
 })(
-  connect(null, {createLocation})(CreateLocation)
+  connect(null, {createLocation: createProducts})(CreateProduct)
 );
 
