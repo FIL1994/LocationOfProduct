@@ -24,7 +24,7 @@ class EditProduct extends Component {
 
   componentDidMount() {
     const {id} = this.props.match.params;
-    this.props.getLocation(id);
+    this.props.getProduct(id);
   }
 
   onSubmit(values) {
@@ -33,13 +33,17 @@ class EditProduct extends Component {
     values = _.omit(values, ['_key', 'locations']);
 
     const {id} = this.props.match.params;
-    this.props.editLocation(id, values, response => this.props.history.push('/'));
+    this.props.editProduct(id, values, response => this.props.history.push('/'));
   }
 
   render() {
     return (
       <Page centered>
-        <ProductForm edit onSubmit={this.props.handleSubmit(this.onSubmit)} submittingPost={this.state.submittingPost}/>
+        <ProductForm
+          edit
+          onSubmit={this.props.handleSubmit(this.onSubmit)}
+          submittingPost={this.state.submittingPost}
+        />
       </Page>
     );
   }
@@ -58,7 +62,7 @@ function validate(values) {
 
 EditProduct = reduxForm({
   validate,
-  form: 'EditLocationForm',
+  form: 'EditProductForm',
   enableReinitialize: true
 })(EditProduct);
 
@@ -66,7 +70,7 @@ EditProduct = connect(
   state => ({
     initialValues: _.omit(state.product, ["_id", "_rev", "latitude", "longitude", "elevation"])
   }),
-  {getLocation: getProduct, editLocation: editProduct}
+  {getProduct, editProduct}
 )(EditProduct);
 
 export default EditProduct;

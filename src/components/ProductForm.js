@@ -26,16 +26,19 @@ function renderField(field) {
   );
 }
 
-export default (props) => {
-  const {edit} = props;
+let ProductForm = (props) => {
+  const {edit, location, cancelRoute} = props;
 
   return(
-    <form {..._.omit(props, 'submittingPost', 'edit')}>
-      <Field
-        label="Description: "
-        name="description"
-        component={renderField}
-      />
+    <form {..._.omit(props, 'submittingPost', 'edit', 'location', 'cancelRoute')}>
+      {
+        location ? '' :
+        <Field
+          label="Description: "
+          name="description"
+          component={renderField}
+        />
+      }
       {
         edit ? '' :
           <Fragment>
@@ -61,10 +64,16 @@ export default (props) => {
         <Button type="submit" primary loading={props.submittingPost}>
           Submit
         </Button>
-        <Button as={Link} to="/" error>
+        <Button as={Link} to={cancelRoute} error>
           Cancel
         </Button>
       </Button.Group>
     </form>
   );
 };
+
+ProductForm.defaultProps = {
+  cancelRoute: "/"
+};
+
+export default ProductForm;

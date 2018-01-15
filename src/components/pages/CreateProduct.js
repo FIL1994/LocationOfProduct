@@ -2,7 +2,7 @@
  * @author Philip Van Raalte
  * @date 2018-01-13
  */
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {reduxForm, Field} from 'redux-form';
 import Datetime from 'react-datetime';
@@ -26,16 +26,19 @@ class CreateProduct extends Component {
   }
 
   onSubmit(values) {
-    values.datetime = SelectedDate.state.inputValue;
+    values.datetime = SelectedDate.state.inputValue.unix();
     this.setState({submittingPost: true});
 
-    this.props.createLocation(values, response => this.props.history.push('/'));
+    this.props.createProducts(values, response => this.props.history.push('/'));
   }
 
   render() {
     return (
       <Page centered>
-        <ProductForm onSubmit={this.props.handleSubmit(this.onSubmit)} submittingPost={this.state.submittingPost}>
+        <ProductForm
+          onSubmit={this.props.handleSubmit(this.onSubmit)}
+          submittingPost={this.state.submittingPost}
+        >
           <Field
             name="time"
             component={field => {
@@ -44,6 +47,7 @@ class CreateProduct extends Component {
 
               return (
                 <div className={className}>
+                  <label>Datetime: </label>
                   <Datetime
                     isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
                     ref={(datetime) => SelectedDate = datetime}
@@ -64,7 +68,7 @@ class CreateProduct extends Component {
 function validate(values) {
   const datetime = () => {
     try {
-      return SelectedDate.state.inputValue;
+      return SelectedDate.state.inputValue.unix();
     } catch (e) {
       return undefined;
     }
@@ -105,8 +109,8 @@ function validate(values) {
 
 export default reduxForm({
   validate,
-  form: 'NewLocationForm'
+  form: 'NewProductForm'
 })(
-  connect(null, {createLocation: createProducts})(CreateProduct)
+  connect(null, {createProducts})(CreateProduct)
 );
 

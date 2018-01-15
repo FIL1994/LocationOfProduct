@@ -9,6 +9,7 @@ import _ from 'lodash';
 
 import {Button, EmptyState, Loading, Table} from './SpectreCSS';
 import {getProducts, deleteProduct} from '../actions';
+import formatDate from '../util/formatDate';
 
 class ProductsShow extends Component {
   componentDidMount() {
@@ -41,7 +42,7 @@ class ProductsShow extends Component {
               <tr key={key}>
                 <td>{key}</td>
                 <td>{description}</td>
-                <td>{datetime}</td>
+                <td>{formatDate(datetime)}</td>
                 <td>{longitude}</td>
                 <td>{latitude}</td>
                 <td>{elevation}</td>

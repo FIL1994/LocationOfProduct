@@ -3,13 +3,14 @@
  * @date 2018-01-13
  */
 import axios from 'axios';
-import {GET_PRODUCTS, FAIL_PRODUCTS, CREATE_PRODUCT, EDIT_PRODUCT, GET_PRODUCT, FAIL_PRODUCT, DELETE_PRODUCT}
+import {GET_PRODUCTS, FAIL_PRODUCTS, CREATE_PRODUCT, GET_PRODUCT, FAIL_PRODUCT, DELETE_PRODUCT,
+  GET_LOCATION}
   from './types';
 
 //API Info
 const ROOT_URL = "http://45.77.106.244:7131/data";
 
-// region Locations
+// region Products
 export function getProducts() {
   return dispatch =>
     axios.get(ROOT_URL)
@@ -27,6 +28,10 @@ export function getProducts() {
 }
 
 export function createProducts(values, callback) {
+  if(!_.isFunction(callback)) {
+    callback = _.noop;
+  }
+
   return dispatch =>
     axios.post(ROOT_URL, values)
       .then(response => callback(response) &&
@@ -43,7 +48,7 @@ export function createProducts(values, callback) {
 }
 // endregion
 
-// region Location
+// region Product
 export function getProduct(id) {
   return dispatch =>
     axios.get(`${ROOT_URL}/${id}`)
@@ -61,14 +66,16 @@ export function getProduct(id) {
 }
 
 export function editProduct(id, values, callback) {
+  if(!_.isFunction(callback)) {
+    callback = _.noop;
+  }
+
   return dispatch =>
     axios.patch(`${ROOT_URL}/${id}`, values)
-      .then(response => callback(response) &&
-        dispatch({
-          type: GET_PRODUCT,
-          payload: response
-        })
-      ).catch(
+      .then(response => {
+        callback(response);
+        dispatch(getProduct(id))
+      }).catch(
       error => callback(error) && dispatch({
         type: FAIL_PRODUCT,
         error
@@ -91,4 +98,22 @@ export function deleteProduct(id) {
       })
     );
 }
-// endregion
+// endregion Location
+
+export function getLocation(product, index) {
+  return {
+    type: GET_LOCATION,
+    payload: product.locations[index]
+  };
+}
+
+export function editLocation(id, location) {
+  return dispatch => {
+    dispatch(getProduct(id)).then(
+      response => {
+        const product = response.data;
+      }
+    );
+  }
+}
+// region

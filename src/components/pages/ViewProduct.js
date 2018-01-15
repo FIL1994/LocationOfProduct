@@ -3,37 +3,14 @@
  * @date 2018-01-13
  */
 import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
+import _ from 'lodash';
 
-import {GoogleMap, Marker, withGoogleMap, withScriptjs, Polyline} from 'react-google-maps';
-
-import {getProduct} from '../../actions';
-import {Loading, Page, Table, Tab} from '../SpectreCSS';
-
-const MyMap = withScriptjs(withGoogleMap((props) => {
-  const {lat, lng} = props;
-  const position = {lat, lng};
-
-    return(
-      <GoogleMap
-      defaultZoom={10}
-      defaultCenter={position}
-    >
-      <Polyline
-        path={
-          props.positions.map(({latitude: lat, longitude: lng}) => ({lat: Number(lat), lng: Number(lng)}))
-        }
-        options={{
-          strokeColor: '#14be39',
-          strokeOpacity: 1,
-          strokeWeight: 2
-        }}
-      />
-      {props.isMarkerShown && <Marker position={position}/>}
-    </GoogleMap>
-    );
-  }
-));
+import {getProduct, editProduct} from '../../actions';
+import {Loading, Page, Table, Tab, Button} from '../SpectreCSS';
+import formatDate from '../../util/formatDate';
+import MyMap from '../MyMap';
 
 class ViewProduct extends Component {
   constructor(props) {
@@ -46,7 +23,7 @@ class ViewProduct extends Component {
 
   componentDidMount() {
     const {id} = this.props.match.params;
-    this.props.getLocation(id);
+    this.props.getProduct(id);
   }
 
   renderContent() {
@@ -57,15 +34,31 @@ class ViewProduct extends Component {
       case "table":
         return(
           <Table centered striped hover>
-            <Table.Head headings={["Datetime", "Elevation", "Latitude", "Longitude"]}/>
+            <Table.Head headings={["Datetime", "Elevation", "Latitude", "Longitude", "Actions"]}/>
             <thead>
             {
               locations.map(({datetime, elevation, latitude, longitude}, index) =>
                 <tr key={index}>
-                  <td>{datetime}</td>
+                  <td>{formatDate(datetime)}</td>
                   <td>{elevation}</td>
                   <td>{latitude}</td>
                   <td>{longitude}</td>
+                  <td>
+                    <Button.Group>
+                      <Button as={Link} to={`/edit/${_key}/${index}`}>
+                        Edit
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          let newLocations = [...locations];
+                          newLocations.splice(index, 1);
+                          this.props.editProduct(_key, {locations: newLocations})
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </Button.Group>
+                  </td>
                 </tr>
               )
             }
@@ -137,4 +130,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, {getLocation: getProduct})(ViewProduct);
+export default connect(mapStateToProps, {getProduct, editProduct})(ViewProduct);

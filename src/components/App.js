@@ -13,6 +13,7 @@ import Home from './pages/Home';
 import CreateProduct from './pages/CreateProduct';
 import EditProduct from './pages/EditProduct';
 import ViewProduct from './pages/ViewProduct';
+import EditLocation from './pages/EditLocation';
 
 class App extends Component {
   render() {
@@ -24,7 +25,8 @@ class App extends Component {
             <Switch>
               <Route exact path="/" component={Home}/>
               <Route path="/post" component={CreateProduct}/>
-              <Route path="/edit/:id" component={EditProduct}/>
+              <Route exact path="/edit/:id" component={EditProduct}/>
+              <Route exact path="/edit/:id/:index" component={EditLocation}/>
               <Route path="/location/:id" component={ViewProduct}/>
               <Redirect to="/"/>
             </Switch>

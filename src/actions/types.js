@@ -8,5 +8,6 @@ export const CREATE_PRODUCT = "create_products";
 
 export const GET_PRODUCT = "get_product";
 export const FAIL_PRODUCT = "fail_product";
-export const EDIT_PRODUCT = "edit_product";
 export const DELETE_PRODUCT = "delete_product";
+
+export const GET_LOCATION = "get_location";
