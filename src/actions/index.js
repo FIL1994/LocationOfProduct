@@ -62,7 +62,7 @@ export function getProduct(id) {
 
 export function editProduct(id, values, callback) {
   return dispatch =>
-    axios.put(`${ROOT_URL}/${id}`, values)
+    axios.patch(`${ROOT_URL}/${id}`, values)
       .then(response => callback(response) &&
         dispatch({
           type: GET_PRODUCT,

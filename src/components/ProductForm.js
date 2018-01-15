@@ -54,11 +54,6 @@ export default (props) => {
             name="elevation"
             component={renderField}
             />
-            <Field
-            label="Datetime: "
-            name="datetime"
-            component={renderField}
-            />
           </Fragment>
       }
       {props.children}

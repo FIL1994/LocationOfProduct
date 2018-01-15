@@ -5,28 +5,28 @@
 import React, {Component, Fragment} from 'react';
 import {connect} from 'react-redux';
 import {reduxForm, Field} from 'redux-form';
-import InputMoment from 'input-moment';
+import Datetime from 'react-datetime';
 import moment from 'moment';
 
 import {Page} from '../SpectreCSS';
 import {createProducts} from '../../actions';
 import ProductForm from '../ProductForm';
 
-let time = undefined;
+let SelectedDate;
 
 class CreateProduct extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      submittingPost: false,
-      m: moment()
+      submittingPost: false
     };
 
     this.onSubmit = this.onSubmit.bind(this);
   }
 
   onSubmit(values) {
+    values.datetime = SelectedDate.state.inputValue;
     this.setState({submittingPost: true});
 
     this.props.createLocation(values, response => this.props.history.push('/'));
@@ -44,17 +44,9 @@ class CreateProduct extends Component {
 
               return (
                 <div className={className}>
-                  <InputMoment
-                    moment={this.state.m}
-                    onChange={m => {
-                      time = new Date(m).getTime();
-                      console.log("time", time);
-                      this.setState({m});
-                    }}
-                    minStep={1}
-                    onSave={() => console.log('saved', this.state.m.format('1111'))}
-                    prevMonthIcon="fa fa-caret-left"
-                    nextMonthIcon="fa fa-caret-right"
+                  <Datetime
+                    isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
+                    ref={(datetime) => SelectedDate = datetime}
                   />
                   <div className="form-input-hint">
                     {error}
@@ -70,7 +62,13 @@ class CreateProduct extends Component {
 }
 
 function validate(values) {
-  console.log("TIME", time);
+  const datetime = () => {
+    try {
+      return SelectedDate.state.inputValue;
+    } catch (e) {
+      return undefined;
+    }
+  };
 
   const {description, elevation, latitude, longitude} = values;
   let errors = {};
@@ -98,12 +96,8 @@ function validate(values) {
     errors.longitude = "Must be between -180 and 180";
   }
 
-  if(time !== undefined) {
-    if(!_.isFinite(time)) {
-      errors.time = "Invalid time";
-    } else if(time > Date.now()) {
-      errors.time = "You cannot select a date in the future";
-    }
+  if(datetime === undefined) {
+    errors.time = "You must select a time";
   }
 
   return errors;

@@ -5,6 +5,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {reduxForm} from 'redux-form';
+import _ from 'lodash';
 
 import {Page} from '../SpectreCSS';
 import {getProduct, editProduct} from '../../actions';
@@ -28,6 +29,8 @@ class EditProduct extends Component {
 
   onSubmit(values) {
     this.setState({submittingPost: true});
+
+    values = _.omit(values, ['_key', 'locations']);
 
     const {id} = this.props.match.params;
     this.props.editLocation(id, values, response => this.props.history.push('/'));
