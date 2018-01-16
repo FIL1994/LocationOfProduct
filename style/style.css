@@ -1,20 +1,3 @@
-header {
-  margin-bottom: 5px;
-}
-
-footer {
-  margin-top: 5px;
-  min-height: 80px;
-}
-
-footer a {
-  color: white;
-}
-
-footer a:hover {
-  color: #5f5dff;
-}
-
 body {
   background-color: #f3f3f3;
 }
@@ -34,10 +17,6 @@ body {
 .page {
   width: 95%;
   margin-top: 10px;
-}
-
-.navbar-section .btn {
-  height: 100%;
 }
 
 .rdtPicker {

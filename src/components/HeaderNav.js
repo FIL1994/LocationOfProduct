@@ -4,6 +4,7 @@
  */
 import React, {Component} from 'react';
 import {NavLink, withRouter} from 'react-router-dom';
+import {Menu, Segment} from 'semantic-ui-react';
 
 class HeaderNav extends Component {
   isLinkActive(match) {
@@ -15,19 +16,21 @@ class HeaderNav extends Component {
 
   render() {
     return(
-      <header className="navbar bg-dark">
-        <section className="navbar-section">
-          <h5 className="pt-2 px-2">Location of Product</h5>
-        </section>
-        <section className="navbar-section">
-          <NavLink to="/" className="btn btn-lg" activeClassName="btn-primary" isActive={this.isLinkActive}>
-            Home
-          </NavLink>
-          <NavLink to="/post" className="btn btn-lg" activeClassName="btn-primary" isActive={this.isLinkActive}>
-            Add Product
-          </NavLink>
-        </section>
-      </header>
+      <Segment inverted as="header">
+        <Menu inverted secondary size="small">
+          <Menu.Item>
+            <h4>Location of Product</h4>
+          </Menu.Item>
+          <Menu.Menu position="right">
+            <Menu.Item as={NavLink} to="/" activeClassName="active" isActive={this.isLinkActive}>
+              Home
+            </Menu.Item>
+            <Menu.Item as={NavLink} to="/post" activeClassName="active" isActive={this.isLinkActive}>
+              Add Product
+            </Menu.Item>
+          </Menu.Menu>
+        </Menu>
+      </Segment>
     );
   }
 }
