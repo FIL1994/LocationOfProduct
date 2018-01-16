@@ -80,6 +80,7 @@ class ViewProduct extends Component {
       0
     );
 
+    // only show pagination if there is more than 1 page
     const locationsPagination = totalPages < 2 ? '' :
       (
         <Grid.Column width={16} textAlign="center">
@@ -112,7 +113,9 @@ class ViewProduct extends Component {
           </Table.Header>
           <Table.Body>
             <Table.Row>
-              <Table.Cell/><Table.Cell/><Table.Cell/><Table.Cell/>
+              {
+                [...Array(4)].map((v, i) => <Table.Cell key={`cell-${i}`}/>)
+              }
               <Table.Cell>
                 <Button as={Link} to={`/location/${_key}/post`} fluid primary compact>
                   Add Location
@@ -120,6 +123,7 @@ class ViewProduct extends Component {
               </Table.Cell>
             </Table.Row>
             {
+              // get set of locations based on selected page
               locations.slice((activePage*perPage)-perPage, (activePage * perPage) - 1)
                 .map(({datetime, elevation, latitude, longitude, key}) =>
                   <Table.Row key={key}>
@@ -128,7 +132,7 @@ class ViewProduct extends Component {
                     <Table.Cell>{latitude}</Table.Cell>
                     <Table.Cell>{longitude}</Table.Cell>
                     <Table.Cell>
-                      <Button.Group>
+                      <Button.Group fluid compact>
                         <Button
                           color='yellow'
                           as={Link}
@@ -187,9 +191,12 @@ class ViewProduct extends Component {
             <Grid.Column width={1}/>
             <Grid.Column width={6}>
               <Datetime
-                isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
+                isValidDate={
+                  // don't allow dates in the future
+                  currentDate => moment(Date.now()).isAfter(currentDate)
+                }
                 ref={i => this.startDate = i}
-                onChange={(m) => this.setState({startDate: m})}
+                onChange={m => this.setState({startDate: m})}
                 defaultValue={
                   tryCatch(() => _.min(this.props.product.locations.map(l => Number(l.datetime))), 0)
                 }
@@ -217,11 +224,11 @@ class ViewProduct extends Component {
 
   render() {
     const {product} = this.props;
+    const {description} = product;
 
     if(_.isEmpty(product)) {
       return <DefaultLoader/>;
     }
-    const {description} = product;
 
     return(
     <Container textAlign="center">
@@ -242,6 +249,8 @@ function mapStateToProps(state) {
   let {product} = state;
 
   if(!_.isEmpty(product)) {
+    // give locations a key based on their index
+    // index is unreliable cant be used after locations are filtered
     product.locations.map((l, index) => {
       l.key = index;
       return l;

@@ -1,16 +1,22 @@
 /**
+ * index.js
+ *
  * @author Philip Van Raalte
  * @date 2018-01-13
  */
 import axios from 'axios';
-import {GET_PRODUCTS, FAIL_PRODUCTS, CREATE_PRODUCT, GET_PRODUCT, FAIL_PRODUCT, DELETE_PRODUCT,
-  GET_LOCATION}
-  from './types';
+import
+  {GET_PRODUCTS, FAIL_PRODUCTS, CREATE_PRODUCT, GET_PRODUCT, FAIL_PRODUCT, DELETE_PRODUCT, GET_LOCATION}
+    from './types';
 
-//API Info
+// the url for the api
 const ROOT_URL = "http://45.77.106.244:7131/data";
 
 // region Products
+/**
+ * Get the products from the server
+ * @returns {function(*): Promise<AxiosResponse<any>>}
+ */
 export function getProducts() {
   return dispatch =>
     axios.get(ROOT_URL)
@@ -27,6 +33,12 @@ export function getProducts() {
     );
 }
 
+/**
+ * Send a product to the server to add
+ * @param values
+ * @param callback
+ * @returns {function(*): Promise<AxiosResponse<any>>}
+ */
 export function createProducts(values, callback) {
   if(!_.isFunction(callback)) {
     callback = _.noop;
@@ -49,6 +61,11 @@ export function createProducts(values, callback) {
 // endregion
 
 // region Product
+/**
+ * Get a specific product from the server
+ * @param id
+ * @returns {function(*): Promise<AxiosResponse<any>>}
+ */
 export function getProduct(id) {
   return dispatch =>
     axios.get(`${ROOT_URL}/${id}`)
@@ -65,6 +82,13 @@ export function getProduct(id) {
     );
 }
 
+/**
+ * Edit a specific product
+ * @param id
+ * @param values
+ * @param callback
+ * @returns {function(*): Promise<AxiosResponse<any>>}
+ */
 export function editProduct(id, values, callback) {
   if(!_.isFunction(callback)) {
     callback = _.noop;
@@ -83,6 +107,11 @@ export function editProduct(id, values, callback) {
     );
 }
 
+/**
+ * Delete a product
+ * @param id
+ * @returns {function(*): Promise<AxiosResponse<any>>}
+ */
 export function deleteProduct(id) {
   return dispatch =>
     axios.delete(`${ROOT_URL}/${id}`)
@@ -100,20 +129,16 @@ export function deleteProduct(id) {
 }
 // endregion Location
 
+/**
+ * Get a location from a product
+ * @param product
+ * @param index
+ * @returns {{type, payload: *}}
+ */
 export function getLocation(product, index) {
   return {
     type: GET_LOCATION,
     payload: product.locations[index]
   };
-}
-
-export function editLocation(id, location) {
-  return dispatch => {
-    dispatch(getProduct(id)).then(
-      response => {
-        const product = response.data;
-      }
-    );
-  }
 }
 // region

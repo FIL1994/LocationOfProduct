@@ -7,6 +7,10 @@
 import React from 'react';
 import {Segment, Container, List} from 'semantic-ui-react';
 
+/**
+ * A component for the footer of the page
+ * @returns {*}
+ */
 export default () =>
   <Segment as="footer" inverted id="footer">
     <Container textAlign="center">

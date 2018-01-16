@@ -34,6 +34,12 @@ function renderField(field) {
   );
 }
 
+/**
+ * A component for showing a form for a product
+ * @param props
+ * @returns {*}
+ * @constructor
+ */
 let ProductForm = (props) => {
   const {edit, location, cancelRoute} = props;
 

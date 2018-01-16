@@ -16,6 +16,9 @@ import formatDate from '../util/formatDate';
 import tryCatch from '../util/tryCatch';
 import DefaultLoader from './DefaultLoader';
 
+/**
+ * A component for displaying products
+ */
 class ProductsShow extends Component {
   constructor(props) {
     super(props);
@@ -36,6 +39,11 @@ class ProductsShow extends Component {
     this.props.getLocations();
   }
 
+  /**
+   * Event handler for clicking a heading on a table.
+   * It updates the state with the column and whether to sort in ascending order
+   * @param clickedColumn
+   */
   onHeadingClicked(clickedColumn) {
     if(clickedColumn === "Actions") {
       return;
@@ -54,6 +62,12 @@ class ProductsShow extends Component {
     });
   }
 
+  /**
+   * Returns an icon to represent if the table heading is being sorted
+   * @param thisColumn
+   * @param isString
+   * @returns {JSX} <i/> component
+   */
   renderIcon(thisColumn, isString) {
     const {column, sortAsc} = this.state;
     let className = "fa fa-sort";
@@ -77,11 +91,12 @@ class ProductsShow extends Component {
 
     const {query, column, sortAsc} = this.state;
 
-    let productsToReturn = [...products];
+    let productsToReturn = [...products]; // clone products so state is not mutated
     if(!_.isEmpty(query)) {
       productsToReturn = _.compact(productsToReturn.map(p => {
         let send = false;
 
+        // loop through the values in the object's entries and compare them to the search query
         const objectEntries = Object.entries(p);
         for (let i in objectEntries) {
           const [, value] = objectEntries[i];
@@ -95,6 +110,7 @@ class ProductsShow extends Component {
       }));
     }
 
+    // sort the products by the selected column and order
     productsToReturn = _.orderBy(
       productsToReturn,
       [column],
@@ -127,6 +143,7 @@ class ProductsShow extends Component {
       0
     );
 
+    // only show pagination if there is more than 1 page
     const productsPagination = totalPages < 2 ? '' :
       (
         <Grid.Column width={16}>
@@ -148,30 +165,30 @@ class ProductsShow extends Component {
             <Table.Row>
               {
                 [
-                  [<div className="c-hand">
+                  [<Fragment>
                     {'ID '}
                     {this.renderIcon('_id', false)}
-                  </div>, '_id'],
-                  [<div className="c-hand">
+                  </Fragment>, '_id'],
+                  [<Fragment>
                     {'Description '}
                     {this.renderIcon('description', true)}
-                  </div>, 'description'],
-                  [<div className="c-hand">
+                  </Fragment>, 'description'],
+                  [<Fragment>
                     {'Datetime '}
                     {this.renderIcon('datetime', false)}
-                  </div>, 'datetime'],
-                  [<div className="c-hand">
+                  </Fragment>, 'datetime'],
+                  [<Fragment>
                     {'Longitude '}
                     {this.renderIcon('longitude', false)}
-                  </div>, 'longitude'],
-                  [<div className="c-hand">
+                  </Fragment>, 'longitude'],
+                  [<Fragment>
                     {'Latitude '}
                     {this.renderIcon('latitude', false)}
-                  </div>, 'latitude'],
-                  [<div className="c-hand">
+                  </Fragment>, 'latitude'],
+                  [<Fragment>
                     {'Elevation '}
                     {this.renderIcon('elevation', false)}
-                  </div>, 'elevation'],
+                  </Fragment>, 'elevation'],
                   "Actions"
                 ].map(h =>
                   _.isArray(h)
@@ -195,12 +212,13 @@ class ProductsShow extends Component {
           </Table.Header>
           <Table.Body>
           <Table.Row>
-            <Table.Cell/><Table.Cell/><Table.Cell/><Table.Cell/><Table.Cell/><Table.Cell/>
+            {[...Array(6)].map((v, i) => <Table.Cell key={`cell-${i}`}/>)}
             <Table.Cell>
               <Button as={Link} to="post" fluid primary compact>Add Product</Button>
             </Table.Cell>
           </Table.Row>
             {
+              // get set of products based on selected page
               products.slice((activePage*perPage)-perPage, (activePage * perPage) - 1)
                 .map(({_key: key, description, datetime, longitude, latitude, elevation}) =>
                   <Table.Row key={key}>
@@ -211,7 +229,7 @@ class ProductsShow extends Component {
                     <td>{latitude}</td>
                     <td>{elevation}</td>
                     <td>
-                      <Button.Group compact>
+                      <Button.Group fluid compact>
                         <Button
                           color='teal'
                           as={Link}
@@ -281,6 +299,7 @@ function mapStateToProps(state) {
   if(_.isArray(products)) {
     return {
       products: products.map(p => (
+        // get the product and the properties from the most recent location (datetime, lng, lat, elev)
         {...p, ...p.locations.slice(-1)[0]}
       ))
     };

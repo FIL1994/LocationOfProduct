@@ -82,7 +82,7 @@ class EditLocation extends Component {
           cancelRoute={`/location/${this.props.match.params.id}`}
         >
           {
-            datetime !== undefined ? '' :
+            datetime === undefined ? '' :
               <Field
                 name="time"
                 component={field => {

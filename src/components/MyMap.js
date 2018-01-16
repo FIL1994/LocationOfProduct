@@ -7,6 +7,9 @@
 import React from 'react';
 import {withGoogleMap, withScriptjs, GoogleMap, Polyline, Marker} from 'react-google-maps';
 
+/**
+ * A component for showing a GoogleMap component with a Polyline and a Marker
+ */
 export default withScriptjs(withGoogleMap((props) => {
     const {lat, lng} = props;
     const position = {lat, lng};

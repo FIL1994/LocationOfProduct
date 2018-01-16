@@ -1,4 +1,6 @@
 /**
+ * index.js
+ *
  * @author Philip Van Raalte
  * @date 2018-01-13
  */
