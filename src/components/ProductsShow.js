@@ -174,7 +174,7 @@ class ProductsShow extends Component {
             </td>
           </tr>
             {
-              products.slice(activePage-1, activePage + perPage - 1)
+              products.slice((activePage*perPage)-perPage, (activePage * perPage) - 1)
                 .map(({_key: key, description, datetime, longitude, latitude, elevation}) =>
                   <tr key={key}>
                     <td>{key}</td>

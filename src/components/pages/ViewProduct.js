@@ -97,7 +97,7 @@ class ViewProduct extends Component {
                 </td>
               </tr>
               {
-                locations.slice(activePage-1, activePage + perPage - 1)
+                locations.slice((activePage*perPage)-perPage, (activePage * perPage) - 1)
                   .map(({datetime, elevation, latitude, longitude, key}) =>
                     <tr key={key}>
                       <td>{formatDate(datetime)}</td>
