@@ -1,4 +1,6 @@
 /**
+ * EditLocation.js
+ *
  * @author Philip Van Raalte
  * @date 2018-01-15
  */
@@ -10,10 +12,10 @@ import Datetime from 'react-datetime';
 import moment from 'moment';
 import {Container} from 'semantic-ui-react';
 
-import {Loading} from '../SpectreCSS';
 import {getProduct, getLocation, editProduct} from '../../actions';
 import ProductForm from '../ProductForm';
 import tryCatch from '../../util/tryCatch';
+import DefaultLoader from '../DefaultLoader';
 
 let selectedDate;
 
@@ -63,7 +65,7 @@ class EditLocation extends Component {
     const {product, location: {datetime}} = this.props;
 
     if(!product) {
-      return <Container textAlign="center"><Loading large/></Container>;
+      return <DefaultLoader/>;
     }
 
     return(
@@ -121,14 +123,14 @@ function validate(values) {
     errors.elevation = "Elevation must be a number";
   }
   if(!latitude) {
-    errors.latitude = "Enter an latitude";
+    errors.latitude = "Enter a latitude";
   } else if(!_.isFinite(Number(latitude))) {
     errors.latitude = "Latitude must be a number";
   } else if(Number(latitude) > 85 || Number(latitude) < -85) {
     errors.latitude = "Must be between -85 and 85";
   }
   if(!longitude) {
-    errors.longitude = "Enter an longitude";
+    errors.longitude = "Enter a longitude";
   } else if(!_.isFinite(Number(longitude))) {
     errors.longitude = "Longitude must be a number";
   } else if(Number(longitude) > 180 || Number(longitude) < -180) {

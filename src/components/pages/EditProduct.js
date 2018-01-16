@@ -1,4 +1,6 @@
 /**
+ * EditProduct.js
+ *
  * @author Philip Van Raalte
  * @date 2018-01-13
  */
@@ -7,11 +9,11 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {reduxForm} from 'redux-form';
 import _ from 'lodash';
-import {Container} from 'semantic-ui-react';
+import {Container, Button} from 'semantic-ui-react';
 
-import {Button} from '../SpectreCSS';
 import {getProduct, editProduct} from '../../actions';
 import ProductForm from '../ProductForm';
+import DefaultLoader from '../DefaultLoader';
 
 class EditProduct extends Component {
   constructor(props) {
@@ -39,6 +41,10 @@ class EditProduct extends Component {
   }
 
   render() {
+    if(!this.props.product) {
+      return <DefaultLoader/>;
+    }
+
     return (
       <Container>
         <ProductForm
@@ -47,7 +53,7 @@ class EditProduct extends Component {
           submittingPost={this.state.submittingPost}
         >
           <div className="form-group">
-            <Button as={Link} to={`/location/${this.props.match.params.id}`} block>View Locations</Button>
+            <Button as={Link} to={`/location/${this.props.match.params.id}`} fluid>View Locations</Button>
           </div>
         </ProductForm>
       </Container>
@@ -74,7 +80,8 @@ EditProduct = reduxForm({
 
 EditProduct = connect(
   state => ({
-    initialValues: _.omit(state.product, ["_id", "_rev", "latitude", "longitude", "elevation"])
+    initialValues: _.omit(state.product, ["_id", "_rev", "latitude", "longitude", "elevation"]),
+    product: state.product
   }),
   {getProduct, editProduct}
 )(EditProduct);

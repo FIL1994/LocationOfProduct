@@ -1,4 +1,6 @@
 /**
+ * ProductsShow.js
+ *
  * @author Philip Van Raalte
  * @date 2018-01-13
  */
@@ -6,12 +8,13 @@ import React, {Component, Fragment} from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import _ from 'lodash';
-import {Grid, Pagination, Button, Table} from 'semantic-ui-react';
+import {Grid, Pagination, Button, Table, Form, Input} from 'semantic-ui-react';
 
-import {EmptyState, Loading} from './SpectreCSS';
+import {EmptyState} from './SpectreCSS';
 import {getProducts, deleteProduct} from '../actions';
 import formatDate from '../util/formatDate';
 import tryCatch from '../util/tryCatch';
+import DefaultLoader from './DefaultLoader';
 
 class ProductsShow extends Component {
   constructor(props) {
@@ -68,9 +71,10 @@ class ProductsShow extends Component {
   }
 
   filterProducts(products) {
-    if(products === undefined) {
+    if(_.isEmpty(products)) {
       return undefined;
     }
+
     const {query, column, sortAsc} = this.state;
 
     let productsToReturn = [...products];
@@ -114,7 +118,7 @@ class ProductsShow extends Component {
         );
       }
       // locations are loading
-      return <Loading large/>;
+      return <DefaultLoader/>;
     }
 
     const {activePage, perPage} = this.state;
@@ -175,6 +179,7 @@ class ProductsShow extends Component {
                     <Table.HeaderCell
                       key={`heading-${h[1]}`}
                       onClick={() => this.onHeadingClicked(h[1])}
+                      style={{cursor: "pointer"}}
                     >
                       {h[0]}
                     </Table.HeaderCell>
@@ -242,15 +247,14 @@ class ProductsShow extends Component {
   renderFilterOptions() {
     return(
       <Grid.Column width={16}>
-        <div className="input-group form-group">
-          <input type="text" className="form-input" onChange={e => this.setState(
-              {query: _.toUpper(e.target.value)}
-            )}
-          />
-          <Button primary onClick={() => this.forceUpdate()}>
-            Search
-          </Button>
-        </div>
+        <Input
+          fluid
+          icon="search"
+          onChange={e => this.setState(
+            {query: _.toUpper(e.target.value)}
+          )}
+          placeholder="Search..."
+        />
       </Grid.Column>
     );
   }
@@ -263,7 +267,7 @@ class ProductsShow extends Component {
           {this.renderFilterOptions()}
           </Grid.Column>
         </Grid.Row>
-        <Grid.Row>
+        <Grid.Row style={{marginTop: -15}}>
           {this.renderLocations()}
         </Grid.Row>
       </Grid>

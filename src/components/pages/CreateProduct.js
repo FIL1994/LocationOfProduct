@@ -1,4 +1,6 @@
 /**
+ * CreateProduct.js
+ *
  * @author Philip Van Raalte
  * @date 2018-01-13
  */
@@ -87,14 +89,14 @@ function validate(values) {
     errors.elevation = "Elevation must be a number";
   }
   if(!latitude) {
-    errors.latitude = "Enter an latitude";
+    errors.latitude = "Enter a latitude";
   } else if(!_.isFinite(Number(latitude))) {
     errors.latitude = "Latitude must be a number";
   } else if(Number(latitude) > 85 || Number(latitude) < -85) {
     errors.latitude = "Must be between -85 and 85";
   }
   if(!longitude) {
-    errors.longitude = "Enter an longitude";
+    errors.longitude = "Enter a longitude";
   } else if(!_.isFinite(Number(longitude))) {
     errors.longitude = "Longitude must be a number";
   } else if(Number(longitude) > 180 || Number(longitude) < -180) {

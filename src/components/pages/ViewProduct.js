@@ -1,4 +1,6 @@
 /**
+ * ViewProduct.js
+ *
  * @author Philip Van Raalte
  * @date 2018-01-13
  */
@@ -11,10 +13,10 @@ import moment from 'moment';
 import {Container, Grid, Pagination, Header, Form, Tab, Table, Button} from 'semantic-ui-react';
 
 import {getProduct, editProduct} from '../../actions';
-import {Loading, Page} from '../SpectreCSS';
 import formatDate from '../../util/formatDate';
 import tryCatch from '../../util/tryCatch';
 import MyMap from '../MyMap';
+import DefaultLoader from '../DefaultLoader';
 
 class ViewProduct extends Component {
   constructor(props) {
@@ -28,7 +30,7 @@ class ViewProduct extends Component {
     startDate: undefined,
     endDate: undefined,
     activePage: 1,
-    perPage: 20
+    perPage: 15
   };
   startDate = undefined;
   endDate = undefined;
@@ -89,8 +91,9 @@ class ViewProduct extends Component {
       );
 
     return(
-      <Tab.Pane>
+      <Fragment>
         {this.renderFilterOptions()}
+        <div style={{marginTop: 5}}/>
         {locationsPagination}
         <Table celled selectable striped stackable verticalAlign="middle" textAlign="center">
           <Table.Header>
@@ -148,7 +151,7 @@ class ViewProduct extends Component {
           </Table.Body>
         </Table>
         {locationsPagination}
-      </Tab.Pane>
+      </Fragment>
     );
   }
 
@@ -176,27 +179,35 @@ class ViewProduct extends Component {
   renderFilterOptions() {
     return(
       <Form>
-        <span style={{float: "left"}}>
-          <Datetime
-            isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
-            ref={i => this.startDate = i}
-            onChange={(m) => this.setState({startDate: m})}
-            defaultValue={
-              tryCatch(() => _.min(this.props.product.locations.map(l => Number(l.datetime))), 0)
-            }
-            utc
-          />
-        </span>
-        to
-        <span style={{float: "right"}}>
-          <Datetime
-            isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
-            ref={i => this.endDate = i}
-            onChange={(m) => this.setState({endDate: m})}
-            defaultValue={Date.now()}
-            utc
-          />
-        </span>
+        <Grid centered verticalAlign="top" textAlign="center">
+          <Grid.Row>
+            <Grid.Column width={1}/>
+            <Grid.Column width={6}>
+              <Datetime
+                isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
+                ref={i => this.startDate = i}
+                onChange={(m) => this.setState({startDate: m})}
+                defaultValue={
+                  tryCatch(() => _.min(this.props.product.locations.map(l => Number(l.datetime))), 0)
+                }
+                utc
+              />
+            </Grid.Column>
+            <Grid.Column width={2} textAlign="center" style={{marginTop: 8}}>
+              to
+            </Grid.Column>
+            <Grid.Column width={6}>
+              <Datetime
+                isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
+                ref={i => this.endDate = i}
+                onChange={(m) => this.setState({endDate: m})}
+                defaultValue={Date.now()}
+                utc
+              />
+            </Grid.Column>
+            <Grid.Column width={1}/>
+          </Grid.Row>
+        </Grid>
       </Form>
     );
   }
@@ -205,7 +216,7 @@ class ViewProduct extends Component {
     const {product} = this.props;
 
     if(_.isEmpty(product)) {
-      return <Page centered><Loading large/></Page>;
+      return <DefaultLoader/>;
     }
     const {description} = product;
 

@@ -1,4 +1,6 @@
 /**
+ * HeaderNav.js
+ *
  * @author Philip Van Raalte
  * @date 2018-01-13
  */
@@ -16,10 +18,10 @@ class HeaderNav extends Component {
 
   render() {
     return(
-      <Segment inverted as="header">
+      <Segment inverted as="header" id="header">
         <Menu inverted secondary size="large">
           <Menu.Item>
-            <h4>Location of Product</h4>
+            <h3>Location of Product</h3>
           </Menu.Item>
           <Menu.Menu position="right">
             <Menu.Item as={NavLink} to="/" activeClassName="active" isActive={this.isLinkActive}>

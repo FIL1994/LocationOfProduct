@@ -1,4 +1,6 @@
 /**
+ * Footer.js
+ *
  * @author Philip Van Raalte
  * @date 2018-01-13
  */
@@ -6,7 +8,7 @@ import React from 'react';
 import {Segment, Container, List} from 'semantic-ui-react';
 
 export default () =>
-  <Segment as="footer" inverted>
+  <Segment as="footer" inverted id="footer">
     <Container textAlign="center">
       <List inverted link>
         <List.Item
