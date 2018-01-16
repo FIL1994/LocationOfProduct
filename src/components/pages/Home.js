@@ -9,6 +9,9 @@ import {Container} from 'semantic-ui-react';
 
 import ProductsShow from '../ProductsShow';
 
+/**
+ * A component for the home page
+ */
 class Home extends Component {
   render() {
     return(

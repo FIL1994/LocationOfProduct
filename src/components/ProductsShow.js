@@ -134,7 +134,7 @@ class ProductsShow extends Component {
             onPageChange={
               (e, i) => this.setState({activePage: i.activePage})
             }
-            defaultActivePage={activePage}
+            activePage={activePage}
             totalPages={totalPages}
           />
         </Grid.Column>

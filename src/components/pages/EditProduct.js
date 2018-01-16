@@ -15,16 +15,19 @@ import {getProduct, editProduct} from '../../actions';
 import ProductForm from '../ProductForm';
 import DefaultLoader from '../DefaultLoader';
 
+/**
+ * A component for editing a product
+ */
 class EditProduct extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      submittingPost: false
-    };
-
     this.onSubmit = this.onSubmit.bind(this);
   }
+
+  state = {
+    submittingPost: false
+  };
 
   componentDidMount() {
     const {id} = this.props.match.params;
@@ -32,8 +35,10 @@ class EditProduct extends Component {
   }
 
   onSubmit(values) {
+    // let the user know their request is being processed
     this.setState({submittingPost: true});
 
+    // remove unnecessary props
     values = _.omit(values, ['_key', 'locations']);
 
     const {id} = this.props.match.params;
@@ -80,6 +85,7 @@ EditProduct = reduxForm({
 
 EditProduct = connect(
   state => ({
+    // remove unnecessary props
     initialValues: _.omit(state.product, ["_id", "_rev", "latitude", "longitude", "elevation"]),
     product: state.product
   }),

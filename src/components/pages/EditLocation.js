@@ -19,17 +19,20 @@ import DefaultLoader from '../DefaultLoader';
 
 let selectedDate;
 
+/**
+ * A component for editing a location.
+ */
 class EditLocation extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      submittingPost: false,
-      gotLocation: false
-    };
-
     this.onSubmit = this.onSubmit.bind(this);
   }
+
+  state = {
+    submittingPost: false,
+    gotLocation: false
+  };
 
   componentDidMount() {
     const {id} = this.props.match.params;
@@ -39,6 +42,7 @@ class EditLocation extends Component {
   componentDidUpdate() {
     const {product} = this.props;
 
+    // get location when product is accessible
     if(!_.isEmpty(product) && !this.state.gotLocation) {
       const {index} = this.props.match.params;
       this.props.getLocation(product, index);
@@ -48,6 +52,7 @@ class EditLocation extends Component {
 
   onSubmit(values) {
     const {id, index} = this.props.match.params;
+    // get the unix time from the date picker
     values.datetime = moment(selectedDate.state.inputValue).toDate().getTime();
     // clone locations and replace location
     let newLocations = [...this.props.product.locations];
@@ -110,6 +115,7 @@ class EditLocation extends Component {
 }
 
 function validate(values) {
+  // the date picker does not integrate w/ Redux Form so manually get the date
   const datetime = tryCatch(
     () => moment(selectedDate.state.inputValue).toDate().getTime()
   );

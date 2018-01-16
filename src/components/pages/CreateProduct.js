@@ -13,25 +13,35 @@ import {Container} from 'semantic-ui-react';
 
 import {createProducts} from '../../actions';
 import ProductForm from '../ProductForm';
+import tryCatch from '../../util/tryCatch';
 
 let selectedDate;
 
+/**
+ * A component for creating a product
+ */
 class CreateProduct extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      submittingPost: false
-    };
-
     this.onSubmit = this.onSubmit.bind(this);
   }
 
+  state = {
+    submittingPost: false
+  };
+
   onSubmit(values) {
+    // get the unix time from the date picker
     values.datetime = moment(selectedDate.state.inputValue).toDate().getTime();
+    // let the user know their request is being processed
     this.setState({submittingPost: true});
 
-    this.props.createProducts(values, response => this.props.history.push('/'));
+    this.props.createProducts(
+      values,
+      // callback to move the user back to the home page when the request has been processed
+      response => this.props.history.push('/')
+    );
   }
 
   render() {
@@ -69,13 +79,10 @@ class CreateProduct extends Component {
 }
 
 function validate(values) {
-  const datetime = () => {
-    try {
-      return selectedDate.state.inputValue.unix();
-    } catch (e) {
-      return undefined;
-    }
-  };
+  // the date picker does not integrate w/ Redux Form so manually get the date
+  const datetime = tryCatch(
+    () => moment(selectedDate.state.inputValue).toDate().getTime()
+  );
 
   const {description, elevation, latitude, longitude} = values;
   let errors = {};

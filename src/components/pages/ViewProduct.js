@@ -18,6 +18,9 @@ import tryCatch from '../../util/tryCatch';
 import MyMap from '../MyMap';
 import DefaultLoader from '../DefaultLoader';
 
+/**
+ * A component for viewing details about a product
+ */
 class ViewProduct extends Component {
   constructor(props) {
     super(props);
@@ -32,8 +35,8 @@ class ViewProduct extends Component {
     activePage: 1,
     perPage: 15
   };
-  startDate = undefined;
-  endDate = undefined;
+  startDate;
+  endDate;
 
   componentDidMount() {
     const {id} = this.props.match.params;
@@ -73,7 +76,7 @@ class ViewProduct extends Component {
     const locations = this.filterLocations(product.locations);
 
     const totalPages = tryCatch(
-      () => _.ceil(product.locations.length / perPage),
+      () => _.ceil(locations.length / perPage),
       0
     );
 
@@ -84,7 +87,7 @@ class ViewProduct extends Component {
             onPageChange={
               (e, i) => this.setState({activePage: i.activePage})
             }
-            defaultActivePage={activePage}
+            activePage={activePage}
             totalPages={totalPages}
           />
         </Grid.Column>

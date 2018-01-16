@@ -19,6 +19,9 @@ import DefaultLoader from '../DefaultLoader';
 
 let selectedDate;
 
+/**
+ * A component for creating a location and adding it to a product
+ */
 class CreateLocation extends Component {
   constructor(props) {
     super(props);
@@ -36,12 +39,16 @@ class CreateLocation extends Component {
 
   onSubmit(values) {
     const {id} = this.props.match.params;
+    // get the unix time from the date picker
     values.datetime = moment(selectedDate.state.inputValue).toDate().getTime();
-
+    // let the user know their request is being processed
     this.setState({submittingPost: true});
+
     this.props.editProduct(
       id,
+      // appending new location to the product's location list
       {locations: [...this.props.product.locations, values]},
+      // callback to move the user back to the product details when the request has been processed
       response => this.props.history.push(`/location/${this.props.match.params.id}`)
     );
   }
@@ -88,6 +95,7 @@ class CreateLocation extends Component {
 }
 
 function validate(values) {
+  // the date picker does not integrate w/ Redux Form so manually get the date
   const datetime = tryCatch(
     () => moment(selectedDate.state.inputValue).toDate().getTime()
   );
