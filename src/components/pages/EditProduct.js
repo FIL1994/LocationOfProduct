@@ -4,10 +4,11 @@
  */
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {Link} from 'react-router-dom';
 import {reduxForm} from 'redux-form';
 import _ from 'lodash';
 
-import {Page} from '../SpectreCSS';
+import {Button, Page} from '../SpectreCSS';
 import {getProduct, editProduct} from '../../actions';
 import ProductForm from '../ProductForm';
 
@@ -43,7 +44,11 @@ class EditProduct extends Component {
           edit
           onSubmit={this.props.handleSubmit(this.onSubmit)}
           submittingPost={this.state.submittingPost}
-        />
+        >
+          <div className="form-group">
+            <Button as={Link} to={`/location/${this.props.match.params.id}`} block>View Locations</Button>
+          </div>
+        </ProductForm>
       </Page>
     );
   }

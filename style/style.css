@@ -46,6 +46,6 @@ body {
   margin-right: auto;
 }
 
-.rdt input {
+form .rdt input {
   width: 100%;
 }

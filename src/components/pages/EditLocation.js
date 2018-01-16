@@ -77,6 +77,7 @@ class EditLocation extends Component {
                     <div className={className}>
                       <label>Datetime: </label>
                       <Datetime
+                        inputProps={{className: "form-input"}}
                         isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
                         ref={(datetime) => SelectedDate = datetime}
                         defaultValue={

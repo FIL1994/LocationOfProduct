@@ -2,33 +2,62 @@
  * @author Philip Van Raalte
  * @date 2018-01-13
  */
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import _ from 'lodash';
+import Datetime from 'react-datetime';
+import moment from 'moment';
 
 import {getProduct, editProduct} from '../../actions';
 import {Loading, Page, Table, Tab, Button} from '../SpectreCSS';
 import formatDate from '../../util/formatDate';
+import tryCatch from '../../util/tryCatch';
 import MyMap from '../MyMap';
 
 class ViewProduct extends Component {
-  constructor(props) {
-    super(props);
+  renderFilterOptions = this.renderFilterOptions.bind(this);
 
-    this.state = {
-      tab: "table"
-    };
-  }
+  state = {
+    tab: "table"
+  };
+  startDate = undefined;
+  endDate = undefined;
 
   componentDidMount() {
     const {id} = this.props.match.params;
     this.props.getProduct(id);
   }
 
+  filterLocations(locations) {
+    function getTime(date) {
+      console.log(date.state.inputValue);
+      return moment(date.state.inputValue).toDate().getTime();
+    }
+
+    return tryCatch(
+      () => {
+        const start = getTime(this.startDate);
+        const end = getTime(this.endDate);
+
+        return locations.filter(({datetime}) => {
+          datetime = Number(datetime);
+          console.log(
+            datetime.toLocaleString(),
+            start.toLocaleString(),
+            end.toLocaleString(),
+            datetime >= start && datetime <= end);
+          return datetime >= start && datetime <= end;
+        });
+      },
+      locations
+    );
+  }
+
   renderContent() {
     const {product} = this.props;
-    const {locations, _key} = product;
+    const {_key} = product;
+    const locations = this.filterLocations(product.locations);
 
     switch(this.state.tab) {
       case "table":
@@ -37,21 +66,21 @@ class ViewProduct extends Component {
             <Table.Head headings={["Datetime", "Elevation", "Latitude", "Longitude", "Actions"]}/>
             <thead>
             {
-              locations.map(({datetime, elevation, latitude, longitude}, index) =>
-                <tr key={index}>
+              locations.map(({datetime, elevation, latitude, longitude, key}) =>
+                <tr key={key}>
                   <td>{formatDate(datetime)}</td>
                   <td>{elevation}</td>
                   <td>{latitude}</td>
                   <td>{longitude}</td>
                   <td>
                     <Button.Group>
-                      <Button as={Link} to={`/edit/${_key}/${index}`}>
+                      <Button as={Link} to={`/edit/${_key}/${key}`}>
                         Edit
                       </Button>
                       <Button
                         onClick={() => {
                           let newLocations = [...locations];
-                          newLocations.splice(index, 1);
+                          newLocations.splice(key, 1);
                           this.props.editProduct(_key, {locations: newLocations})
                         }}
                       >
@@ -83,6 +112,35 @@ class ViewProduct extends Component {
     }
   }
 
+  renderFilterOptions() {
+    return(
+      <Fragment>
+        <label>Date Range</label>
+        <div className="form-group">
+          <Datetime
+            className="float-left"
+            inputProps={{className: "form-input"}}
+            isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
+            ref={i => this.startDate = i}
+            onChange={() => this.forceUpdate()}
+            defaultValue={
+              tryCatch(() => _.min(this.props.product.locations.map(l => Number(l.datetime))), 0)
+            }
+          />
+          to
+          <Datetime
+            className="float-right"
+            inputProps={{className: "form-input"}}
+            isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
+            ref={i => this.endDate = i}
+            onChange={() => this.forceUpdate()}
+            defaultValue={Date.now()}
+          />
+        </div>
+      </Fragment>
+    );
+  }
+
   render() {
     const {product} = this.props;
     const {tab} = this.state;
@@ -94,7 +152,9 @@ class ViewProduct extends Component {
 
     return(
     <Page centered>
-      Description: {description}
+      <div className="h5">{description}</div>
+      {this.renderFilterOptions()}
+      <div style={{height: 1}}/>
       <hr/>
       <Tab block>
         <Tab.Heading
@@ -117,9 +177,14 @@ class ViewProduct extends Component {
 }
 
 function mapStateToProps(state) {
-  const {product} = state;
+  let {product} = state;
 
   if(!_.isEmpty(product)) {
+    product.locations.map((l, index) => {
+      l.key = index;
+      return l;
+    });
+
     return {
       product
     };

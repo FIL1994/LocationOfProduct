@@ -12,12 +12,48 @@ import {getProducts, deleteProduct} from '../actions';
 import formatDate from '../util/formatDate';
 
 class ProductsShow extends Component {
+  state = {
+    query: undefined,
+    products: undefined
+  };
+
   componentDidMount() {
     this.props.getLocations();
   }
 
+  filterProducts(products) {
+    if(products === undefined) {
+      return undefined;
+    }
+    const {query} = this.state;
+
+    if(_.isEmpty(query)) {
+      return products;
+    }
+
+    let productsToReturn = [...products];
+
+    productsToReturn = _.compact(productsToReturn.map(p => {
+      let send = false;
+
+      const objectEntries = Object.entries(p);
+      for (let i in objectEntries) {
+        const [, value] = objectEntries[i];
+        if(_.toUpper(value).includes(query)) {
+          send = true;
+          break;
+        }
+      }
+
+      return send ? p : false;
+    }));
+
+
+    return productsToReturn;
+  }
+
   renderLocations() {
-    const {products} = this.props;
+    const products = this.filterProducts(this.props.products);
 
     // handle if products is empty
     if(_.isEmpty(products)) {
@@ -67,10 +103,25 @@ class ProductsShow extends Component {
     );
   }
 
+  renderFilterOptions() {
+    return(
+      <Fragment>
+        <div className="input-group form-group">
+          <input type="text" className="form-input" onChange={e => this.setState(
+            {query: _.toUpper(e.target.value)}
+            )}/>
+          <Button primary inputGroup>
+            Search
+          </Button>
+        </div>
+      </Fragment>
+    );
+  }
+
   render() {
     return(
       <Fragment>
-        <h3>Products</h3>
+        {this.renderFilterOptions()}
         {this.renderLocations()}
       </Fragment>
     );
