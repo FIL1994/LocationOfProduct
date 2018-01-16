@@ -26,7 +26,7 @@ class CreateProduct extends Component {
   }
 
   onSubmit(values) {
-    values.datetime = selectedDate.state.inputValue.unix();
+    values.datetime = moment(selectedDate.state.inputValue).toDate().getTime();
     this.setState({submittingPost: true});
 
     this.props.createProducts(values, response => this.props.history.push('/'));
