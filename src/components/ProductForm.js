@@ -5,6 +5,7 @@
 import React, {Fragment} from 'react';
 import {Link} from "react-router-dom";
 import {Field} from 'redux-form';
+import {Form} from 'semantic-ui-react';
 import {Button} from './SpectreCSS';
 
 function renderField(field) {
@@ -30,7 +31,7 @@ let ProductForm = (props) => {
   const {edit, location, cancelRoute} = props;
 
   return(
-    <form {..._.omit(props, 'submittingPost', 'edit', 'location', 'cancelRoute')}>
+    <Form {..._.omit(props, 'submittingPost', 'edit', 'location', 'cancelRoute')}>
       {
         location ? '' :
         <Field
@@ -68,7 +69,7 @@ let ProductForm = (props) => {
           Cancel
         </Button>
       </Button.Group>
-    </form>
+    </Form>
   );
 };
 

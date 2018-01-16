@@ -8,9 +8,10 @@ import {connect} from 'react-redux';
 import _ from 'lodash';
 import Datetime from 'react-datetime';
 import moment from 'moment';
+import {Container, Grid, Pagination, Header, Form} from 'semantic-ui-react';
 
 import {getProduct, editProduct} from '../../actions';
-import {Loading, Page, Table, Tab, Button, Pagination} from '../SpectreCSS';
+import {Loading, Page, Table, Tab, Button} from '../SpectreCSS';
 import formatDate from '../../util/formatDate';
 import tryCatch from '../../util/tryCatch';
 import MyMap from '../MyMap';
@@ -71,19 +72,23 @@ class ViewProduct extends Component {
         );
 
         const locationsPagination = totalPages < 2 ? '' :
-          <Pagination
-            centered
-            onClick={
-              (e, i) => this.setState({activePage: i})
-            }
-            activePage={activePage}
-            totalPages={totalPages}
-          />;
+          (
+            <Grid.Column width={16} textAlign="center">
+              <Pagination
+                onPageChange={
+                  (e, i) => this.setState({activePage: i.activePage})
+                }
+                defaultActivePage={activePage}
+                totalPages={totalPages}
+              />
+            </Grid.Column>
+          );
 
         return(
           <Fragment>
-            {this.renderFilterOptions()}
-            <br/>
+            <Grid.Column width={16} textAlign="center">
+              {this.renderFilterOptions()}
+            </Grid.Column>
             {locationsPagination}
             <Table centered striped hover>
               <Table.Head headings={["Datetime", "Elevation", "Latitude", "Longitude", "Actions"]}/>
@@ -148,11 +153,9 @@ class ViewProduct extends Component {
 
   renderFilterOptions() {
     return(
-      <Fragment>
-        <div style={{marginTop: 5}} className="form-group">
+      <Form>
+        <span style={{float: "left"}}>
           <Datetime
-            className="float-left"
-            inputProps={{className: "form-input"}}
             isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
             ref={i => this.startDate = i}
             onChange={(m) => this.setState({startDate: m})}
@@ -161,18 +164,18 @@ class ViewProduct extends Component {
             }
             utc
           />
-          to
+        </span>
+        to
+        <span style={{float: "right"}}>
           <Datetime
-            className="float-right"
-            inputProps={{className: "form-input"}}
             isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
             ref={i => this.endDate = i}
             onChange={(m) => this.setState({endDate: m})}
             defaultValue={Date.now()}
             utc
           />
-        </div>
-      </Fragment>
+        </span>
+      </Form>
     );
   }
 
@@ -186,24 +189,32 @@ class ViewProduct extends Component {
     const {description} = product;
 
     return(
-    <Page centered>
-      <div className="h5">{description}</div>
-      <Tab block>
-        <Tab.Heading
-          active={tab === "table"}
-          onClick={() => this.setState({tab: "table"})}
-        >
-          <a href="#">Table</a>
-        </Tab.Heading>
-        <Tab.Heading
-          active={tab === "map"}
-          onClick={() => this.setState({tab: "map"})}
-        >
-          <a href="#">Map</a>
-        </Tab.Heading>
-      </Tab>
-      {this.renderContent()}
-    </Page>
+    <Container>
+      <Grid>
+        <Grid.Row>
+          <Grid.Column width={16} textAlign="center">
+            <Header as="h3">{description}</Header>
+          </Grid.Column>
+          <Grid.Column width={16}>
+            <Tab block>
+              <Tab.Heading
+                active={tab === "table"}
+                onClick={() => this.setState({tab: "table"})}
+              >
+                <a href="#">Table</a>
+              </Tab.Heading>
+              <Tab.Heading
+                active={tab === "map"}
+                onClick={() => this.setState({tab: "map"})}
+              >
+                <a href="#">Map</a>
+              </Tab.Heading>
+            </Tab>
+          </Grid.Column>
+          {this.renderContent()}
+        </Grid.Row>
+      </Grid>
+    </Container>
     );
   }
 }

@@ -6,8 +6,9 @@ import React, {Component, Fragment} from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import _ from 'lodash';
+import {Grid, Pagination} from 'semantic-ui-react';
 
-import {Button, EmptyState, Loading, Table, Pagination} from './SpectreCSS';
+import {Button, EmptyState, Loading, Table} from './SpectreCSS';
 import {getProducts, deleteProduct} from '../actions';
 import formatDate from '../util/formatDate';
 import tryCatch from '../util/tryCatch';
@@ -123,14 +124,17 @@ class ProductsShow extends Component {
     );
 
     const productsPagination = totalPages < 2 ? '' :
-      <Pagination
-        centered
-        onClick={
-          (e, i) => this.setState({activePage: i})
-        }
-        activePage={activePage}
-        totalPages={totalPages}
-      />;
+      (
+        <Grid.Column width={16}>
+          <Pagination
+            onPageChange={
+              (e, i) => this.setState({activePage: i.activePage})
+            }
+            defaultActivePage={activePage}
+            totalPages={totalPages}
+          />
+        </Grid.Column>
+      );
 
     return(
       <Fragment>
@@ -208,7 +212,7 @@ class ProductsShow extends Component {
 
   renderFilterOptions() {
     return(
-      <Fragment>
+      <Grid.Column width={16}>
         <div className="input-group form-group">
           <input type="text" className="form-input" onChange={e => this.setState(
               {query: _.toUpper(e.target.value)}
@@ -218,16 +222,22 @@ class ProductsShow extends Component {
             Search
           </Button>
         </div>
-      </Fragment>
+      </Grid.Column>
     );
   }
 
   render() {
     return(
-      <Fragment>
-        {this.renderFilterOptions()}
-        {this.renderLocations()}
-      </Fragment>
+      <Grid textAlign="center">
+        <Grid.Row>
+          <Grid.Column width={16}>
+          {this.renderFilterOptions()}
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          {this.renderLocations()}
+        </Grid.Row>
+      </Grid>
     );
   }
 }

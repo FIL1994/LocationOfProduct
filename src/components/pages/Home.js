@@ -3,16 +3,16 @@
  * @date 2018-01-13
  */
 import React, {Component} from 'react';
+import {Container} from 'semantic-ui-react';
 
-import {Page} from '../SpectreCSS';
 import ProductsShow from '../ProductsShow';
 
 class Home extends Component {
   render() {
     return(
-      <Page centered>
+      <Container>
         <ProductsShow/>
-      </Page>
+      </Container>
     );
   }
 }

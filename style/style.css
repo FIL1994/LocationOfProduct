@@ -14,11 +14,6 @@ body {
   flex: 1;
 }
 
-.page {
-  width: 95%;
-  margin-top: 10px;
-}
-
 .rdtPicker {
   position: relative;
   margin-left: auto;

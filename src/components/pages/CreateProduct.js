@@ -7,8 +7,8 @@ import {connect} from 'react-redux';
 import {reduxForm, Field} from 'redux-form';
 import Datetime from 'react-datetime';
 import moment from 'moment';
+import {Container} from 'semantic-ui-react';
 
-import {Page} from '../SpectreCSS';
 import {createProducts} from '../../actions';
 import ProductForm from '../ProductForm';
 
@@ -34,7 +34,7 @@ class CreateProduct extends Component {
 
   render() {
     return (
-      <Page centered>
+      <Container>
         <ProductForm
           onSubmit={this.props.handleSubmit(this.onSubmit)}
           submittingPost={this.state.submittingPost}
@@ -61,7 +61,7 @@ class CreateProduct extends Component {
             }}
           />
         </ProductForm>
-      </Page>
+      </Container>
     );
   }
 }

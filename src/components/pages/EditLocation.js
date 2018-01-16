@@ -8,8 +8,9 @@ import {reduxForm, Field} from 'redux-form';
 import _ from 'lodash';
 import Datetime from 'react-datetime';
 import moment from 'moment';
+import {Container} from 'semantic-ui-react';
 
-import {Page, Loading} from '../SpectreCSS';
+import {Loading} from '../SpectreCSS';
 import {getProduct, getLocation, editProduct} from '../../actions';
 import ProductForm from '../ProductForm';
 import tryCatch from '../../util/tryCatch';
@@ -62,11 +63,11 @@ class EditLocation extends Component {
     const {product, location: {datetime}} = this.props;
 
     if(!product) {
-      return <Page centered><Loading large/></Page>;
+      return <Container textAlign="center"><Loading large/></Container>;
     }
 
     return(
-      <Page centered>
+      <Container>
         <ProductForm
           location
           onSubmit={this.props.handleSubmit(this.onSubmit)}
@@ -101,7 +102,7 @@ class EditLocation extends Component {
               />
           }
         </ProductForm>
-      </Page>
+      </Container>
     );
   }
 }
