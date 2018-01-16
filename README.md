@@ -1,5 +1,5 @@
 # LocationOfProduct
-
+A React/Redux application for tracking the location of a product
 
 ![Image](http://lp.philvr.com/screenshots/1.png)
 
