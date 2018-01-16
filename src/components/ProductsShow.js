@@ -6,9 +6,9 @@ import React, {Component, Fragment} from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import _ from 'lodash';
-import {Grid, Pagination} from 'semantic-ui-react';
+import {Grid, Pagination, Button, Table} from 'semantic-ui-react';
 
-import {Button, EmptyState, Loading, Table} from './SpectreCSS';
+import {EmptyState, Loading} from './SpectreCSS';
 import {getProducts, deleteProduct} from '../actions';
 import formatDate from '../util/formatDate';
 import tryCatch from '../util/tryCatch';
@@ -139,48 +139,66 @@ class ProductsShow extends Component {
     return(
       <Fragment>
         {productsPagination}
-        <Table centered striped hover>
-          <Table.Head
-            headings={[
-              [<div className="c-hand">
-                {'ID '}
-                {this.renderIcon('_id', false)}
-              </div>, '_id'],
-              [<div className="c-hand">
-                {'Description '}
-                {this.renderIcon('description', true)}
-              </div>, 'description'],
-              [<div className="c-hand">
-                {'Datetime '}
-                {this.renderIcon('datetime', false)}
-              </div>, 'datetime'],
-              [<div className="c-hand">
-                {'Longitude '}
-                {this.renderIcon('longitude', false)}
-              </div>, 'longitude'],
-              [<div className="c-hand">
-                {'Latitude '}
-                {this.renderIcon('latitude', false)}
-              </div>, 'latitude'],
-              [<div className="c-hand">
-                {'Elevation '}
-                {this.renderIcon('elevation', false)}
-              </div>, 'elevation'],
-              "Actions"
-            ]}
-            onHeadingClick={this.onHeadingClicked}
-          />
-          <thead>
-          <tr>
-            <td/><td/><td/><td/><td/><td/>
-            <td>
-              <Button as={Link} to="post" primary>Add Product</Button>
-            </td>
-          </tr>
+        <Table celled selectable striped stackable verticalAlign="middle" textAlign="center">
+          <Table.Header>
+            <Table.Row>
+              {
+                [
+                  [<div className="c-hand">
+                    {'ID '}
+                    {this.renderIcon('_id', false)}
+                  </div>, '_id'],
+                  [<div className="c-hand">
+                    {'Description '}
+                    {this.renderIcon('description', true)}
+                  </div>, 'description'],
+                  [<div className="c-hand">
+                    {'Datetime '}
+                    {this.renderIcon('datetime', false)}
+                  </div>, 'datetime'],
+                  [<div className="c-hand">
+                    {'Longitude '}
+                    {this.renderIcon('longitude', false)}
+                  </div>, 'longitude'],
+                  [<div className="c-hand">
+                    {'Latitude '}
+                    {this.renderIcon('latitude', false)}
+                  </div>, 'latitude'],
+                  [<div className="c-hand">
+                    {'Elevation '}
+                    {this.renderIcon('elevation', false)}
+                  </div>, 'elevation'],
+                  "Actions"
+                ].map(h =>
+                  _.isArray(h)
+                    ?
+                    <Table.HeaderCell
+                      key={`heading-${h[1]}`}
+                      onClick={() => this.onHeadingClicked(h[1])}
+                    >
+                      {h[0]}
+                    </Table.HeaderCell>
+                    :
+                    <Table.HeaderCell
+                      key={`heading-${h}`}
+                    >
+                      {h}
+                    </Table.HeaderCell>
+                )
+              }
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+          <Table.Row>
+            <Table.Cell/><Table.Cell/><Table.Cell/><Table.Cell/><Table.Cell/><Table.Cell/>
+            <Table.Cell>
+              <Button as={Link} to="post" fluid primary compact>Add Product</Button>
+            </Table.Cell>
+          </Table.Row>
             {
               products.slice((activePage*perPage)-perPage, (activePage * perPage) - 1)
                 .map(({_key: key, description, datetime, longitude, latitude, elevation}) =>
-                  <tr key={key}>
+                  <Table.Row key={key}>
                     <td>{key}</td>
                     <td>{description}</td>
                     <td>{formatDate(datetime)}</td>
@@ -188,22 +206,33 @@ class ProductsShow extends Component {
                     <td>{latitude}</td>
                     <td>{elevation}</td>
                     <td>
-                      <Button.Group>
-                        <Button as={Link} to={`/location/${key}`}>
+                      <Button.Group compact>
+                        <Button
+                          color='teal'
+                          as={Link}
+                          to={`/location/${key}`}
+                        >
                           View
                         </Button>
-                        <Button as={Link} to={`/edit/${key}`}>
+                        <Button
+                          color='yellow'
+                          as={Link}
+                          to={`/edit/${key}`}
+                        >
                           Edit
                         </Button>
-                        <Button onClick={() => this.props.deleteLocation(key)}>
+                        <Button
+                          color='red'
+                          onClick={() => this.props.deleteLocation(key)}
+                        >
                           Delete
                         </Button>
                       </Button.Group>
                     </td>
-                  </tr>
+                  </Table.Row>
               )
             }
-          </thead>
+          </Table.Body>
         </Table>
         {productsPagination}
       </Fragment>
@@ -218,7 +247,7 @@ class ProductsShow extends Component {
               {query: _.toUpper(e.target.value)}
             )}
           />
-          <Button primary inputGroup onClick={() => this.forceUpdate()}>
+          <Button primary onClick={() => this.forceUpdate()}>
             Search
           </Button>
         </div>

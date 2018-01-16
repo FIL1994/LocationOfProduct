@@ -8,17 +8,23 @@ import {connect} from 'react-redux';
 import _ from 'lodash';
 import Datetime from 'react-datetime';
 import moment from 'moment';
-import {Container, Grid, Pagination, Header, Form} from 'semantic-ui-react';
+import {Container, Grid, Pagination, Header, Form, Tab, Table, Button} from 'semantic-ui-react';
 
 import {getProduct, editProduct} from '../../actions';
-import {Loading, Page, Table, Tab, Button} from '../SpectreCSS';
+import {Loading, Page} from '../SpectreCSS';
 import formatDate from '../../util/formatDate';
 import tryCatch from '../../util/tryCatch';
 import MyMap from '../MyMap';
 
 class ViewProduct extends Component {
+  constructor(props) {
+    super(props);
+
+    this.renderMap = this.renderMap.bind(this);
+    this.renderTable = this.renderTable.bind(this);
+  }
+
   state = {
-    tab: "table",
     startDate: undefined,
     endDate: undefined,
     activePage: 1,
@@ -58,97 +64,113 @@ class ViewProduct extends Component {
     );
   }
 
-  renderContent() {
-    const {activePage, tab, perPage} = this.state;
+  renderTable() {
+    const {activePage, perPage} = this.state;
     const {product} = this.props;
     const {_key} = product;
     const locations = this.filterLocations(product.locations);
 
-    switch(tab) {
-      case "table":
-        const totalPages = tryCatch(
-          () => _.ceil(product.locations.length / perPage),
-          0
-        );
+    const totalPages = tryCatch(
+      () => _.ceil(product.locations.length / perPage),
+      0
+    );
 
-        const locationsPagination = totalPages < 2 ? '' :
-          (
-            <Grid.Column width={16} textAlign="center">
-              <Pagination
-                onPageChange={
-                  (e, i) => this.setState({activePage: i.activePage})
-                }
-                defaultActivePage={activePage}
-                totalPages={totalPages}
-              />
-            </Grid.Column>
-          );
+    const locationsPagination = totalPages < 2 ? '' :
+      (
+        <Grid.Column width={16} textAlign="center">
+          <Pagination
+            onPageChange={
+              (e, i) => this.setState({activePage: i.activePage})
+            }
+            defaultActivePage={activePage}
+            totalPages={totalPages}
+          />
+        </Grid.Column>
+      );
 
-        return(
-          <Fragment>
-            <Grid.Column width={16} textAlign="center">
-              {this.renderFilterOptions()}
-            </Grid.Column>
-            {locationsPagination}
-            <Table centered striped hover>
-              <Table.Head headings={["Datetime", "Elevation", "Latitude", "Longitude", "Actions"]}/>
-              <thead>
-              <tr>
-                <td/><td/><td/><td/>
-                <td>
-                  <Button as={Link} to={`/location/${_key}/post`} primary>
-                    Add Location
-                  </Button>
-                </td>
-              </tr>
+    return(
+      <Tab.Pane>
+        {this.renderFilterOptions()}
+        {locationsPagination}
+        <Table celled selectable striped stackable verticalAlign="middle" textAlign="center">
+          <Table.Header>
+            <Table.Row>
               {
-                locations.slice((activePage*perPage)-perPage, (activePage * perPage) - 1)
-                  .map(({datetime, elevation, latitude, longitude, key}) =>
-                    <tr key={key}>
-                      <td>{formatDate(datetime)}</td>
-                      <td>{elevation}</td>
-                      <td>{latitude}</td>
-                      <td>{longitude}</td>
-                      <td>
-                        <Button.Group>
-                          <Button as={Link} to={`/edit/${_key}/${key}`}>
-                            Edit
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              let newLocations = [...locations];
-                              newLocations.splice(key, 1);
-                              this.props.editProduct(_key, {locations: newLocations})
-                            }}
-                          >
-                            Delete
-                          </Button>
-                        </Button.Group>
-                      </td>
-                    </tr>
+                ["Datetime", "Elevation", "Latitude", "Longitude", "Actions"].map( h=>
+                  <Table.HeaderCell key={`heading-${h}`}>
+                    {h}
+                  </Table.HeaderCell>
                 )
               }
-              </thead>
-            </Table>
-            {locationsPagination}
-          </Fragment>
-        );
-      case "map":
-        const {latitude, longitude} = locations.slice(-1)[0];
-        return(
-          <MyMap
-            key={_key}
-            isMarkerShown
-            lat={Number(latitude)}
-            lng={Number(longitude)}
-            positions={locations}
-            googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=AIzaSyDqMPwl5XjyehPhDDkRx8wfO0pdtOxghng"
-            loadingElement={<div style={{ height: `100%` }} />}
-            containerElement={<div style={{ height: `500px` }} />}
-            mapElement={<div style={{ height: `100%` }} />}
-          />
-        );
-    }
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            <Table.Row>
+              <Table.Cell/><Table.Cell/><Table.Cell/><Table.Cell/>
+              <Table.Cell>
+                <Button as={Link} to={`/location/${_key}/post`} fluid primary compact>
+                  Add Location
+                </Button>
+              </Table.Cell>
+            </Table.Row>
+            {
+              locations.slice((activePage*perPage)-perPage, (activePage * perPage) - 1)
+                .map(({datetime, elevation, latitude, longitude, key}) =>
+                  <Table.Row key={key}>
+                    <Table.Cell>{formatDate(datetime)}</Table.Cell>
+                    <Table.Cell>{elevation}</Table.Cell>
+                    <Table.Cell>{latitude}</Table.Cell>
+                    <Table.Cell>{longitude}</Table.Cell>
+                    <Table.Cell>
+                      <Button.Group>
+                        <Button
+                          color='yellow'
+                          as={Link}
+                          to={`/edit/${_key}/${key}`}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          color='red'
+                          onClick={() => {
+                            let newLocations = [...locations];
+                            newLocations.splice(key, 1);
+                            this.props.editProduct(_key, {locations: newLocations})
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </Button.Group>
+                    </Table.Cell>
+                  </Table.Row>
+                )
+            }
+          </Table.Body>
+        </Table>
+        {locationsPagination}
+      </Tab.Pane>
+    );
+  }
+
+  renderMap() {
+    const {product} = this.props;
+    const {_key} = product;
+    const locations = this.filterLocations(product.locations);
+
+    const {latitude, longitude} = locations.slice(-1)[0];
+    return(
+      <MyMap
+        key={_key}
+        isMarkerShown
+        lat={Number(latitude)}
+        lng={Number(longitude)}
+        positions={locations}
+        googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=AIzaSyDqMPwl5XjyehPhDDkRx8wfO0pdtOxghng"
+        loadingElement={<div style={{ height: `100%` }} />}
+        containerElement={<div style={{ height: `500px` }} />}
+        mapElement={<div style={{ height: `100%` }} />}
+      />
+    );
   }
 
   renderFilterOptions() {
@@ -181,7 +203,6 @@ class ViewProduct extends Component {
 
   render() {
     const {product} = this.props;
-    const {tab} = this.state;
 
     if(_.isEmpty(product)) {
       return <Page centered><Loading large/></Page>;
@@ -189,31 +210,15 @@ class ViewProduct extends Component {
     const {description} = product;
 
     return(
-    <Container>
-      <Grid>
-        <Grid.Row>
-          <Grid.Column width={16} textAlign="center">
-            <Header as="h3">{description}</Header>
-          </Grid.Column>
-          <Grid.Column width={16}>
-            <Tab block>
-              <Tab.Heading
-                active={tab === "table"}
-                onClick={() => this.setState({tab: "table"})}
-              >
-                <a href="#">Table</a>
-              </Tab.Heading>
-              <Tab.Heading
-                active={tab === "map"}
-                onClick={() => this.setState({tab: "map"})}
-              >
-                <a href="#">Map</a>
-              </Tab.Heading>
-            </Tab>
-          </Grid.Column>
-          {this.renderContent()}
-        </Grid.Row>
-      </Grid>
+    <Container textAlign="center">
+      <Header as="h3">{description}</Header>
+      <Tab
+        menu={{secondary: true, pointing: true}}
+        panes={[
+          {menuItem: 'Table', render: this.renderTable},
+          {menuItem: 'Map', render: this.renderMap}
+        ]}
+      />
     </Container>
     );
   }

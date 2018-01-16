@@ -17,7 +17,7 @@ class HeaderNav extends Component {
   render() {
     return(
       <Segment inverted as="header">
-        <Menu inverted secondary size="small">
+        <Menu inverted secondary size="large">
           <Menu.Item>
             <h4>Location of Product</h4>
           </Menu.Item>

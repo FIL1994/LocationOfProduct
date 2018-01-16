@@ -5,8 +5,7 @@
 import React, {Fragment} from 'react';
 import {Link} from "react-router-dom";
 import {Field} from 'redux-form';
-import {Form} from 'semantic-ui-react';
-import {Button} from './SpectreCSS';
+import {Form, Button} from 'semantic-ui-react';
 
 function renderField(field) {
   const {meta : {touched, error}} = field;
@@ -61,11 +60,12 @@ let ProductForm = (props) => {
           </Fragment>
       }
       {props.children}
-      <Button.Group block>
+      <div style={{marginTop: 5}}/>
+      <Button.Group fluid>
         <Button type="submit" primary loading={props.submittingPost}>
           Submit
         </Button>
-        <Button as={Link} to={cancelRoute} error>
+        <Button as={Link} to={cancelRoute} color='red'>
           Cancel
         </Button>
       </Button.Group>
