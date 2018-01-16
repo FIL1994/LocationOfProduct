@@ -9,63 +9,46 @@ import _ from 'lodash';
 import Datetime from 'react-datetime';
 import moment from 'moment';
 
-import {Page, Loading} from '../SpectreCSS';
-import {getProduct, getLocation, editProduct} from '../../actions';
+import {Loading, Page} from '../SpectreCSS';
+import {getProduct, editProduct} from '../../actions';
 import ProductForm from '../ProductForm';
 import tryCatch from '../../util/tryCatch';
 
 let selectedDate;
 
-class EditLocation extends Component {
+class CreateLocation extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      submittingPost: false,
-      gotLocation: false
-    };
-
     this.onSubmit = this.onSubmit.bind(this);
   }
+
+  state = {
+    submittingPost: false
+  };
 
   componentDidMount() {
     const {id} = this.props.match.params;
     this.props.getProduct(id);
   }
 
-  componentDidUpdate() {
-    const {product} = this.props;
-
-    if(!_.isEmpty(product) && !this.state.gotLocation) {
-      const {index} = this.props.match.params;
-      this.props.getLocation(product, index);
-      this.setState({gotLocation: true});
-    }
-  }
-
   onSubmit(values) {
-    const {id, index} = this.props.match.params;
+    const {id} = this.props.match.params;
     values.datetime = moment(selectedDate.state.inputValue).toDate().getTime();
-    // clone locations and replace location
-    let newLocations = [...this.props.product.locations];
-    newLocations.splice(index, 1, values);
 
     this.setState({submittingPost: true});
     this.props.editProduct(
       id,
-      {locations: newLocations},
+      {locations: [...this.props.product.locations, values]},
       response => this.props.history.push(`/location/${this.props.match.params.id}`)
     );
   }
 
   render() {
-    const {product, location: {datetime}} = this.props;
-
-    if(!product) {
+    if(!this.props.product) {
       return <Page centered><Loading large/></Page>;
     }
 
-    return(
+    return (
       <Page centered>
         <ProductForm
           location
@@ -73,33 +56,28 @@ class EditLocation extends Component {
           submittingPost={this.state.submittingPost}
           cancelRoute={`/location/${this.props.match.params.id}`}
         >
-          {
-            datetime !== undefined ? '' :
-              <Field
-                name="time"
-                component={field => {
-                  const {meta: {error}} = field;
-                  const className = `form-group ${error ? 'has-error' : ''}`;
+          <Field
+            name="time"
+            component={field => {
+              const {meta: {error}} = field;
+              const className = `form-group ${error ? 'has-error' : ''}`;
 
-                  return (
-                    <div className={className}>
-                      <label>Datetime: </label>
-                      <Datetime
-                        inputProps={{className: "form-input"}}
-                        isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
-                        ref={(datetime) => selectedDate = datetime}
-                        defaultValue={
-                          (new Date(Number(datetime)))
-                        }
-                      />
-                      <div className="form-input-hint">
-                        {error}
-                      </div>
-                    </div>
-                  );
-                }}
-              />
-          }
+              return (
+                <div className={className}>
+                  <label>Datetime: </label>
+                  <Datetime
+                    inputProps={{className: "form-input"}}
+                    isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
+                    ref={(datetime) => selectedDate = datetime}
+                    defaultValue={Date.now()}
+                  />
+                  <div className="form-input-hint">
+                    {error}
+                  </div>
+                </div>
+              );
+            }}
+          />
         </ProductForm>
       </Page>
     );
@@ -141,19 +119,16 @@ function validate(values) {
   return errors;
 }
 
-EditLocation = reduxForm({
+CreateLocation = reduxForm({
   validate,
-  form: 'EditLocationForm',
-  enableReinitialize: true
-})(EditLocation);
+  form: 'CreateLocationForm'
+})(CreateLocation);
 
-EditLocation = connect(
+CreateLocation = connect(
   state => ({
-    initialValues: state.location,
-    product: state.product,
-    location: state.location
+    product: state.product
   }),
-  {getProduct, getLocation, editProduct}
-)(EditLocation);
+  {getProduct, editProduct}
+)(CreateLocation);
 
-export default EditLocation;
+export default CreateLocation;

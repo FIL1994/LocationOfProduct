@@ -12,7 +12,7 @@ import {Page} from '../SpectreCSS';
 import {createProducts} from '../../actions';
 import ProductForm from '../ProductForm';
 
-let SelectedDate;
+let selectedDate;
 
 class CreateProduct extends Component {
   constructor(props) {
@@ -26,7 +26,7 @@ class CreateProduct extends Component {
   }
 
   onSubmit(values) {
-    values.datetime = SelectedDate.state.inputValue.unix();
+    values.datetime = selectedDate.state.inputValue.unix();
     this.setState({submittingPost: true});
 
     this.props.createProducts(values, response => this.props.history.push('/'));
@@ -51,7 +51,7 @@ class CreateProduct extends Component {
                   <Datetime
                     inputProps={{className: "form-input"}}
                     isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
-                    ref={(datetime) => SelectedDate = datetime}
+                    ref={(datetime) => selectedDate = datetime}
                   />
                   <div className="form-input-hint">
                     {error}
@@ -69,7 +69,7 @@ class CreateProduct extends Component {
 function validate(values) {
   const datetime = () => {
     try {
-      return SelectedDate.state.inputValue.unix();
+      return selectedDate.state.inputValue.unix();
     } catch (e) {
       return undefined;
     }

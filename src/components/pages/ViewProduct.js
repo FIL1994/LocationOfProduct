@@ -10,16 +10,18 @@ import Datetime from 'react-datetime';
 import moment from 'moment';
 
 import {getProduct, editProduct} from '../../actions';
-import {Loading, Page, Table, Tab, Button} from '../SpectreCSS';
+import {Loading, Page, Table, Tab, Button, Pagination} from '../SpectreCSS';
 import formatDate from '../../util/formatDate';
 import tryCatch from '../../util/tryCatch';
 import MyMap from '../MyMap';
 
 class ViewProduct extends Component {
-  renderFilterOptions = this.renderFilterOptions.bind(this);
-
   state = {
-    tab: "table"
+    tab: "table",
+    startDate: undefined,
+    endDate: undefined,
+    activePage: 1,
+    perPage: 20
   };
   startDate = undefined;
   endDate = undefined;
@@ -30,23 +32,24 @@ class ViewProduct extends Component {
   }
 
   filterLocations(locations) {
+    const {startDate, endDate} = this.state;
+
     function getTime(date) {
-      console.log(date.state.inputValue);
-      return moment(date.state.inputValue).toDate().getTime();
+      return moment(date).toDate().getTime();
     }
 
     return tryCatch(
       () => {
-        const start = getTime(this.startDate);
-        const end = getTime(this.endDate);
+        // date selected or earliest date in data set
+        const start = getTime(startDate || _.min(
+          this.props.product.locations.map(l => Number(l.datetime))
+        ));
+        // date selected or the current date
+        const end = getTime(endDate || Date.now());
 
+        // filter dates within range
         return locations.filter(({datetime}) => {
           datetime = Number(datetime);
-          console.log(
-            datetime.toLocaleString(),
-            start.toLocaleString(),
-            end.toLocaleString(),
-            datetime >= start && datetime <= end);
           return datetime >= start && datetime <= end;
         });
       },
@@ -55,44 +58,75 @@ class ViewProduct extends Component {
   }
 
   renderContent() {
+    const {activePage, tab, perPage} = this.state;
     const {product} = this.props;
     const {_key} = product;
     const locations = this.filterLocations(product.locations);
 
-    switch(this.state.tab) {
+    switch(tab) {
       case "table":
-        return(
-          <Table centered striped hover>
-            <Table.Head headings={["Datetime", "Elevation", "Latitude", "Longitude", "Actions"]}/>
-            <thead>
-            {
-              locations.map(({datetime, elevation, latitude, longitude, key}) =>
-                <tr key={key}>
-                  <td>{formatDate(datetime)}</td>
-                  <td>{elevation}</td>
-                  <td>{latitude}</td>
-                  <td>{longitude}</td>
-                  <td>
-                    <Button.Group>
-                      <Button as={Link} to={`/edit/${_key}/${key}`}>
-                        Edit
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          let newLocations = [...locations];
-                          newLocations.splice(key, 1);
-                          this.props.editProduct(_key, {locations: newLocations})
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </Button.Group>
-                  </td>
-                </tr>
-              )
+        const totalPages = tryCatch(
+          () => _.ceil(product.locations.length / perPage),
+          0
+        );
+
+        const locationsPagination = totalPages < 2 ? '' :
+          <Pagination
+            centered
+            onClick={
+              (e, i) => this.setState({activePage: i})
             }
-            </thead>
-          </Table>
+            activePage={activePage}
+            totalPages={totalPages}
+          />;
+
+        return(
+          <Fragment>
+            {this.renderFilterOptions()}
+            <br/>
+            {locationsPagination}
+            <Table centered striped hover>
+              <Table.Head headings={["Datetime", "Elevation", "Latitude", "Longitude", "Actions"]}/>
+              <thead>
+              <tr>
+                <td/><td/><td/><td/>
+                <td>
+                  <Button as={Link} to={`/location/${_key}/post`} primary>
+                    Add Location
+                  </Button>
+                </td>
+              </tr>
+              {
+                locations.slice(activePage-1, activePage + perPage - 1)
+                  .map(({datetime, elevation, latitude, longitude, key}) =>
+                    <tr key={key}>
+                      <td>{formatDate(datetime)}</td>
+                      <td>{elevation}</td>
+                      <td>{latitude}</td>
+                      <td>{longitude}</td>
+                      <td>
+                        <Button.Group>
+                          <Button as={Link} to={`/edit/${_key}/${key}`}>
+                            Edit
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              let newLocations = [...locations];
+                              newLocations.splice(key, 1);
+                              this.props.editProduct(_key, {locations: newLocations})
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </Button.Group>
+                      </td>
+                    </tr>
+                )
+              }
+              </thead>
+            </Table>
+            {locationsPagination}
+          </Fragment>
         );
       case "map":
         const {latitude, longitude} = locations.slice(-1)[0];
@@ -115,17 +149,17 @@ class ViewProduct extends Component {
   renderFilterOptions() {
     return(
       <Fragment>
-        <label>Date Range</label>
-        <div className="form-group">
+        <div style={{marginTop: 5}} className="form-group">
           <Datetime
             className="float-left"
             inputProps={{className: "form-input"}}
             isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
             ref={i => this.startDate = i}
-            onChange={() => this.forceUpdate()}
+            onChange={(m) => this.setState({startDate: m})}
             defaultValue={
               tryCatch(() => _.min(this.props.product.locations.map(l => Number(l.datetime))), 0)
             }
+            utc
           />
           to
           <Datetime
@@ -133,8 +167,9 @@ class ViewProduct extends Component {
             inputProps={{className: "form-input"}}
             isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
             ref={i => this.endDate = i}
-            onChange={() => this.forceUpdate()}
+            onChange={(m) => this.setState({endDate: m})}
             defaultValue={Date.now()}
+            utc
           />
         </div>
       </Fragment>
@@ -153,9 +188,6 @@ class ViewProduct extends Component {
     return(
     <Page centered>
       <div className="h5">{description}</div>
-      {this.renderFilterOptions()}
-      <div style={{height: 1}}/>
-      <hr/>
       <Tab block>
         <Tab.Heading
           active={tab === "table"}

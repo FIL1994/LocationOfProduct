@@ -14,6 +14,7 @@ import CreateProduct from './pages/CreateProduct';
 import EditProduct from './pages/EditProduct';
 import ViewProduct from './pages/ViewProduct';
 import EditLocation from './pages/EditLocation';
+import CreateLocation from './pages/CreateLocation';
 
 class App extends Component {
   render() {
@@ -27,7 +28,8 @@ class App extends Component {
               <Route path="/post" component={CreateProduct}/>
               <Route exact path="/edit/:id" component={EditProduct}/>
               <Route exact path="/edit/:id/:index" component={EditLocation}/>
-              <Route path="/location/:id" component={ViewProduct}/>
+              <Route exact path="/location/:id" component={ViewProduct}/>
+              <Route exact path="/location/:id/post" component={CreateLocation}/>
               <Redirect to="/"/>
             </Switch>
           </div>

@@ -5,5 +5,5 @@
 import moment from 'moment';
 
 export default (date) => {
-  return moment(new Date(Number(date))).format('MMM D YYYY, h:mm:ss a');
+  return moment(new Date(Number(date))).utc().format('MMM D YYYY, h:mm:ss a');
 }

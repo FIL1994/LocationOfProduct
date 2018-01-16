@@ -3,7 +3,7 @@
  * @date 2018-01-15
  */
 
-export default (functionToTry, defaultValue, log = false) =>  {
+export default (functionToTry, defaultValue = undefined, log = false) =>  {
   try {
     return functionToTry();
   } catch (e) {
