@@ -33,7 +33,9 @@ class ViewProduct extends Component {
     startDate: undefined,
     endDate: undefined,
     activePage: 1,
-    perPage: 15
+    perPage: 15,
+    column: "datetime",
+    sortAsc: false
   };
   startDate;
   endDate;
@@ -43,14 +45,59 @@ class ViewProduct extends Component {
     this.props.getProduct(id);
   }
 
+  /**
+   * Event handler for clicking a heading on a table.
+   * It updates the state with the column and whether to sort in ascending order
+   * @param clickedColumn
+   */
+  onHeadingClicked(clickedColumn) {
+    if(clickedColumn === "actions") {
+      return;
+    }
+    let {column, sortAsc} = this.state;
+
+    if(column !== clickedColumn) {
+      sortAsc = true;
+    } else {
+      sortAsc = !sortAsc;
+    }
+
+    this.setState({
+      column: clickedColumn,
+      sortAsc
+    });
+  }
+
+  /**
+   * Returns an icon to represent if the table heading is being sorted
+   * @param thisColumn
+   * @param isString
+   * @returns {JSX} <i/> component
+   */
+  renderIcon(thisColumn, isString) {
+    const {column, sortAsc} = this.state;
+    let className = "fa fa-sort";
+
+    if(thisColumn === column) {
+      if(isString) {
+        className = sortAsc ? "fa fa-sort-alpha-asc " : "fa fa-sort-alpha-desc";
+      }
+      else {
+        className = sortAsc ? "fa fa-sort-numeric-asc" : "fa fa-sort-numeric-desc";
+      }
+    }
+
+    return <i className={className} aria-hidden="true"/>;
+  }
+
   filterLocations(locations) {
-    const {startDate, endDate} = this.state;
+    const {startDate, endDate, column, sortAsc} = this.state;
 
     function getTime(date) {
       return moment(date).toDate().getTime();
     }
 
-    return tryCatch(
+    let newLocations = tryCatch(
       () => {
         // date selected or earliest date in data set
         const start = getTime(startDate || _.min(
@@ -67,6 +114,14 @@ class ViewProduct extends Component {
       },
       locations
     );
+
+    newLocations = _.orderBy(
+      newLocations,
+      [column],
+      [sortAsc ? 'asc' : 'desc']
+    );
+
+    return newLocations;
   }
 
   renderTable() {
@@ -104,8 +159,21 @@ class ViewProduct extends Component {
             <Table.Row>
               {
                 ["Datetime", "Elevation", "Latitude", "Longitude", "Actions"].map( h=>
-                  <Table.HeaderCell key={`heading-${h}`}>
-                    {h}
+                  <Table.HeaderCell
+                    key={`heading-${h}`}
+                    onClick={() => this.onHeadingClicked(_.toLower(h))}
+                    {
+                      ...(
+                        h === "Actions" ? {} :
+                          {style: {cursor: "pointer"}}
+                      )
+                    }
+                  >
+                    {`${h} `}
+                    {
+                      h === "Actions" ? '' :
+                        this.renderIcon(_.toLower(h), false)
+                    }
                   </Table.HeaderCell>
                 )
               }
