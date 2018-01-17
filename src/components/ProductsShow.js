@@ -8,9 +8,8 @@ import React, {Component, Fragment} from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import _ from 'lodash';
-import {Grid, Pagination, Button, Table, Form, Input} from 'semantic-ui-react';
+import {Grid, Pagination, Button, Table, Input, Message} from 'semantic-ui-react';
 
-import {EmptyState} from './SpectreCSS';
 import {getProducts, deleteProduct} from '../actions';
 import formatDate from '../util/formatDate';
 import tryCatch from '../util/tryCatch';
@@ -24,6 +23,8 @@ class ProductsShow extends Component {
     super(props);
 
     this.onHeadingClicked = this.onHeadingClicked.bind(this);
+    // debounce function so it doesn't run every time the user presses a key
+    this.onQueryChange = _.debounce(this.onQueryChange, 100);
   }
 
   state = {
@@ -37,6 +38,12 @@ class ProductsShow extends Component {
 
   componentDidMount() {
     this.props.getLocations();
+  }
+
+  onQueryChange(val) {
+    this.setState(
+      {query: _.toUpper(val)}
+    );
   }
 
   /**
@@ -128,9 +135,9 @@ class ProductsShow extends Component {
       if(_.isArray(products)) {
         // no products are available
         return(
-          <EmptyState
-            title="No products found."
-          />
+          <Message info size="big">
+            No products found
+          </Message>
         );
       }
       // locations are loading
@@ -268,9 +275,7 @@ class ProductsShow extends Component {
         <Input
           fluid
           icon="search"
-          onChange={e => this.setState(
-            {query: _.toUpper(e.target.value)}
-          )}
+          onChange={(e) => this.onQueryChange(e.target.value)}
           placeholder="Search..."
         />
       </Grid.Column>

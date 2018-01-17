@@ -6,18 +6,14 @@
  */
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {reduxForm, Field} from 'redux-form';
+import {reduxForm} from 'redux-form';
 import _ from 'lodash';
-import Datetime from 'react-datetime';
-import moment from 'moment';
 import {Container} from 'semantic-ui-react';
 
 import {getProduct, editProduct} from '../../actions';
 import ProductForm from '../ProductForm';
-import tryCatch from '../../util/tryCatch';
 import DefaultLoader from '../DefaultLoader';
-
-let selectedDate;
+import DatetimeField from '../DatetimeField';
 
 /**
  * A component for creating a location and adding it to a product
@@ -40,7 +36,8 @@ class CreateLocation extends Component {
   onSubmit(values) {
     const {id} = this.props.match.params;
     // get the unix time from the date picker
-    values.datetime = moment(selectedDate.state.inputValue).toDate().getTime();
+    values.datetime = values.time;
+    values = _.omit(values, ["time"]);
     // let the user know their request is being processed
     this.setState({submittingPost: true});
 
@@ -66,28 +63,7 @@ class CreateLocation extends Component {
           submittingPost={this.state.submittingPost}
           cancelRoute={`/location/${this.props.match.params.id}`}
         >
-          <Field
-            name="time"
-            component={field => {
-              const {meta: {error}} = field;
-              const className = `form-group ${error ? 'has-error' : ''}`;
-
-              return (
-                <div className={className}>
-                  <label>Datetime: </label>
-                  <Datetime
-                    inputProps={{className: "form-input"}}
-                    isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
-                    ref={(datetime) => selectedDate = datetime}
-                    defaultValue={Date.now()}
-                  />
-                  <div className="form-input-hint">
-                    {error}
-                  </div>
-                </div>
-              );
-            }}
-          />
+          <DatetimeField/>
         </ProductForm>
       </Container>
     );
@@ -95,10 +71,7 @@ class CreateLocation extends Component {
 }
 
 function validate(values) {
-  // the date picker does not integrate w/ Redux Form so manually get the date
-  const datetime = tryCatch(
-    () => moment(selectedDate.state.inputValue).toDate().getTime()
-  );
+  const datetime = values.time;
 
   const {elevation, latitude, longitude} = values;
   let errors = {};
@@ -123,7 +96,7 @@ function validate(values) {
     errors.longitude = "Must be between -180 and 180";
   }
 
-  if(datetime === undefined) {
+  if(!_.isFinite(datetime)) {
     errors.time = "You must select a time";
   }
 

@@ -21,15 +21,13 @@ function renderField(field) {
         {...field.input}
         error={Boolean(touched && error)}
       />
-      <div className="form-input-hint">
-        {
-          touched
-            ?
-              <Message error content={error}/>
-            :
-              ''
-        }
-      </div>
+      {
+        touched
+          ?
+            <Message error content={error}/>
+          :
+            ''
+      }
     </div>
   );
 }
@@ -62,14 +60,14 @@ let ProductForm = (props) => {
               component={renderField}
             />
             < Field
-            label="Latitude: "
-            name="latitude"
-            component={renderField}
+              label="Latitude: "
+              name="latitude"
+              component={renderField}
             />
             <Field
-            label="Elevation: "
-            name="elevation"
-            component={renderField}
+              label="Elevation: "
+              name="elevation"
+              component={renderField}
             />
           </Fragment>
       }

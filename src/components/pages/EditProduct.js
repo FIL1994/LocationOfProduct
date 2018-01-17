@@ -57,9 +57,14 @@ class EditProduct extends Component {
           onSubmit={this.props.handleSubmit(this.onSubmit)}
           submittingPost={this.state.submittingPost}
         >
-          <div className="form-group">
-            <Button as={Link} to={`/location/${this.props.match.params.id}`} fluid>View Locations</Button>
-          </div>
+          <Button
+            as={Link}
+            to={`/location/${this.props.match.params.id}`}
+            fluid
+            style={{marginTop: 5}}
+          >
+            View Locations
+          </Button>
         </ProductForm>
       </Container>
     );

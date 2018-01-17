@@ -6,16 +6,12 @@
  */
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {reduxForm, Field} from 'redux-form';
-import Datetime from 'react-datetime';
-import moment from 'moment';
+import {reduxForm} from 'redux-form';
 import {Container} from 'semantic-ui-react';
 
 import {createProducts} from '../../actions';
 import ProductForm from '../ProductForm';
-import tryCatch from '../../util/tryCatch';
-
-let selectedDate;
+import DatetimeField from '../DatetimeField';
 
 /**
  * A component for creating a product
@@ -32,8 +28,8 @@ class CreateProduct extends Component {
   };
 
   onSubmit(values) {
-    // get the unix time from the date picker
-    values.datetime = moment(selectedDate.state.inputValue).toDate().getTime();
+    values.datetime = values.time;
+    values = _.omit(values, ["time"]);
     // let the user know their request is being processed
     this.setState({submittingPost: true});
 
@@ -51,27 +47,7 @@ class CreateProduct extends Component {
           onSubmit={this.props.handleSubmit(this.onSubmit)}
           submittingPost={this.state.submittingPost}
         >
-          <Field
-            name="time"
-            component={field => {
-              const {meta : {error}} = field;
-              const className = `form-group ${error ? 'has-error' : ''}`;
-
-              return (
-                <div className={className}>
-                  <label>Datetime: </label>
-                  <Datetime
-                    inputProps={{className: "form-input"}}
-                    isValidDate={currentDate => moment(Date.now()).isAfter(currentDate)}
-                    ref={(datetime) => selectedDate = datetime}
-                  />
-                  <div className="form-input-hint">
-                    {error}
-                  </div>
-                </div>
-              );
-            }}
-          />
+          <DatetimeField/>
         </ProductForm>
       </Container>
     );
@@ -79,10 +55,7 @@ class CreateProduct extends Component {
 }
 
 function validate(values) {
-  // the date picker does not integrate w/ Redux Form so manually get the date
-  const datetime = tryCatch(
-    () => moment(selectedDate.state.inputValue).toDate().getTime()
-  );
+  const datetime = values.time;
 
   const {description, elevation, latitude, longitude} = values;
   let errors = {};
