@@ -8,7 +8,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {reduxForm} from 'redux-form';
 import _ from 'lodash';
-import {Container} from 'semantic-ui-react';
+import {Container, Divider} from 'semantic-ui-react';
 
 import {getProduct, editProduct} from '../../actions';
 import ProductForm from '../ProductForm';
@@ -57,6 +57,8 @@ class CreateLocation extends Component {
 
     return (
       <Container>
+        <h3 className="text-center">Create Location</h3>
+        <Divider/>
         <ProductForm
           location
           onSubmit={this.props.handleSubmit(this.onSubmit)}

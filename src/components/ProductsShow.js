@@ -8,12 +8,14 @@ import React, {Component, Fragment} from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import _ from 'lodash';
-import {Grid, Pagination, Button, Table, Input, Message} from 'semantic-ui-react';
+import {Grid, Pagination, Button, Table, Input, Message, Select, Icon, Image} from 'semantic-ui-react';
 
 import {getProducts, deleteProduct} from '../actions';
-import formatDate from '../util/formatDate';
-import tryCatch from '../util/tryCatch';
+import {formatDate, tryCatch, getStaticMapURL, iterableArray as iArray} from '../util';
 import DefaultLoader from './DefaultLoader';
+import {GOOGLE_MAPS_KEY} from '../config/keys';
+
+getStaticMapURL.setKey(GOOGLE_MAPS_KEY);
 
 /**
  * A component for displaying products
@@ -52,7 +54,7 @@ class ProductsShow extends Component {
    * @param clickedColumn
    */
   onHeadingClicked(clickedColumn) {
-    if(clickedColumn === "Actions") {
+    if(clickedColumn === "Actions" || "Map") {
       return;
     }
     let {column, sortAsc} = this.state;
@@ -172,6 +174,7 @@ class ProductsShow extends Component {
             <Table.Row>
               {
                 [
+                  "Map",
                   [<Fragment>
                     {'ID '}
                     {this.renderIcon('_id', false)}
@@ -185,13 +188,13 @@ class ProductsShow extends Component {
                     {this.renderIcon('datetime', false)}
                   </Fragment>, 'datetime'],
                   [<Fragment>
-                    {'Longitude '}
-                    {this.renderIcon('longitude', false)}
-                  </Fragment>, 'longitude'],
-                  [<Fragment>
                     {'Latitude '}
                     {this.renderIcon('latitude', false)}
                   </Fragment>, 'latitude'],
+                  [<Fragment>
+                    {'Longitude '}
+                    {this.renderIcon('longitude', false)}
+                  </Fragment>, 'longitude'],
                   [<Fragment>
                     {'Elevation '}
                     {this.renderIcon('elevation', false)}
@@ -219,21 +222,30 @@ class ProductsShow extends Component {
           </Table.Header>
           <Table.Body>
           <Table.Row>
-            {[...Array(6)].map((v, i) => <Table.Cell key={`cell-${i}`}/>)}
+            {iArray(7).map((v, i) => <Table.Cell key={`cell-${i}`}/>)}
             <Table.Cell>
-              <Button as={Link} to="post" fluid primary compact>Add Product</Button>
+              <Button as={Link} to="post" fluid primary>Add Product</Button>
             </Table.Cell>
           </Table.Row>
             {
               // get set of products based on selected page
               products.slice((activePage*perPage)-perPage, (activePage * perPage) - 1)
-                .map(({_key: key, description, datetime, longitude, latitude, elevation}) =>
+                .map(({_key: key, description, datetime, longitude: lng, latitude: lat, elevation}) =>
                   <Table.Row key={key}>
+                    <td>
+                      <Image
+                        as={Link}
+                        to={`/location/${key}`}
+                        src={getStaticMapURL({lat, lng}, [150, 100])}
+                        alt="map"
+                        rounded
+                      />
+                    </td>
                     <td>{key}</td>
                     <td>{description}</td>
                     <td>{formatDate(datetime)}</td>
-                    <td>{longitude}</td>
-                    <td>{latitude}</td>
+                    <td>{lat}</td>
+                    <td>{lng}</td>
                     <td>{elevation}</td>
                     <td>
                       <Button.Group fluid compact>
@@ -242,7 +254,7 @@ class ProductsShow extends Component {
                           as={Link}
                           to={`/location/${key}`}
                         >
-                          View
+                          History
                         </Button>
                         <Button
                           color='yellow'
@@ -270,14 +282,46 @@ class ProductsShow extends Component {
   }
 
   renderFilterOptions() {
+    const {sortAsc} = this.state;
+
     return(
       <Grid.Column width={16}>
         <Input
           fluid
-          icon="search"
-          onChange={(e) => this.onQueryChange(e.target.value)}
-          placeholder="Search..."
-        />
+          iconPosition="left"
+          placeholder="Search for a product..."
+          action
+        >
+          <Icon name='search'/>
+          <input
+            onChange={(e) => this.onQueryChange(e.target.value)}
+          />
+          <Button as="span" basic content="Sort By:" className="no-hover"/>
+          <Select
+            options={[
+              {key: 'id', text: 'ID', value: '_id'},
+              {key: 'description', text: 'Description', value: 'description'},
+              {key: 'datetime', text: 'Datetime', value: 'datetime'},
+              {key: 'latitude', text: 'Latitude', value: 'latitude'},
+              {key: 'longitude', text: 'Longitude', value: 'longitude'},
+              {key: 'elevation', text: 'Elevation', value: 'elevation'}
+            ]}
+            onChange={
+              (e, select) => {
+                if(this.state.column !== select.value) {
+                  this.setState({column: select.value})
+                }
+              }
+            }
+            defaultValue='_id'
+          />
+          <Button icon labelPosition="right" onClick={() => this.setState({sortAsc: !sortAsc})}>
+            <Icon name={sortAsc ? "chevron up": "chevron down"}/>
+            {
+              sortAsc ? `Asc ` : 'Desc'
+            }
+          </Button>
+        </Input>
       </Grid.Column>
     );
   }

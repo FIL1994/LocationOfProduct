@@ -7,7 +7,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {reduxForm} from 'redux-form';
-import {Container} from 'semantic-ui-react';
+import {Container, Divider} from 'semantic-ui-react';
 
 import {createProducts} from '../../actions';
 import ProductForm from '../ProductForm';
@@ -43,6 +43,8 @@ class CreateProduct extends Component {
   render() {
     return (
       <Container>
+        <h3 className="text-center">Create Product</h3>
+        <Divider/>
         <ProductForm
           onSubmit={this.props.handleSubmit(this.onSubmit)}
           submittingPost={this.state.submittingPost}

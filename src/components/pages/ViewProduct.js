@@ -15,8 +15,10 @@ import {Container, Grid, Pagination, Header, Form, Tab, Table, Button} from 'sem
 import {getProduct, editProduct} from '../../actions';
 import formatDate from '../../util/formatDate';
 import tryCatch from '../../util/tryCatch';
+import iArray from '../../util/iterableArray';
 import MyMap from '../MyMap';
 import DefaultLoader from '../DefaultLoader';
+import {GOOGLE_MAPS_KEY} from "../../config/keys";
 
 /**
  * A component for viewing details about a product
@@ -35,7 +37,8 @@ class ViewProduct extends Component {
     activePage: 1,
     perPage: 15,
     column: "datetime",
-    sortAsc: false
+    sortAsc: false,
+    maps: []
   };
   startDate;
   endDate;
@@ -158,7 +161,7 @@ class ViewProduct extends Component {
           <Table.Header>
             <Table.Row>
               {
-                ["Datetime", "Elevation", "Latitude", "Longitude", "Actions"].map( h=>
+                ["Datetime", "Latitude", "Longitude", "Elevation", "Actions"].map( h=>
                   <Table.HeaderCell
                     key={`heading-${h}`}
                     onClick={() => this.onHeadingClicked(_.toLower(h))}
@@ -182,10 +185,10 @@ class ViewProduct extends Component {
           <Table.Body>
             <Table.Row>
               {
-                [...Array(4)].map((v, i) => <Table.Cell key={`cell-${i}`}/>)
+                iArray(4).map((v, i) => <Table.Cell key={`cell-${i}`}/>)
               }
               <Table.Cell>
-                <Button as={Link} to={`/location/${_key}/post`} fluid primary compact>
+                <Button as={Link} to={`/location/${_key}/post`} fluid primary>
                   Add Location
                 </Button>
               </Table.Cell>
@@ -196,9 +199,9 @@ class ViewProduct extends Component {
                 .map(({datetime, elevation, latitude, longitude, key}) =>
                   <Table.Row key={key}>
                     <Table.Cell>{formatDate(datetime)}</Table.Cell>
-                    <Table.Cell>{elevation}</Table.Cell>
                     <Table.Cell>{latitude}</Table.Cell>
                     <Table.Cell>{longitude}</Table.Cell>
+                    <Table.Cell>{elevation}</Table.Cell>
                     <Table.Cell>
                       <Button.Group fluid compact>
                         <Button
@@ -236,6 +239,8 @@ class ViewProduct extends Component {
     const locations = this.filterLocations(product.locations);
 
     const {latitude, longitude} = locations.slice(-1)[0];
+    const {latitude: startLatitude, longitude: startLongitude} = locations[0];
+
     return(
       <MyMap
         key={_key}
@@ -243,10 +248,17 @@ class ViewProduct extends Component {
         lat={Number(latitude)}
         lng={Number(longitude)}
         positions={locations}
-        googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=AIzaSyDqMPwl5XjyehPhDDkRx8wfO0pdtOxghng"
+        googleMapURL={
+          `https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=${GOOGLE_MAPS_KEY}`
+        }
         loadingElement={<div style={{ height: `100%` }} />}
         containerElement={<div style={{ height: `500px` }} />}
         mapElement={<div style={{ height: `100%` }} />}
+        {
+          ...(locations.length < 2 ? {} : {
+            startPosition: {lat: Number(startLatitude), lng: Number(startLongitude)}
+          })
+        }
       />
     );
   }

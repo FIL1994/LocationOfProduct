@@ -28,8 +28,8 @@ class App extends Component {
               <Route path="/post" component={CreateProduct}/>
               <Route exact path="/edit/:id" component={EditProduct}/>
               <Route exact path="/edit/:id/:index" component={EditLocation}/>
-              <Route exact path="/location/:id" component={ViewProduct}/>
               <Route exact path="/location/:id/post" component={CreateLocation}/>
+              <Route path="/location/:id" component={ViewProduct}/>
               <Redirect to="/"/>
             </Switch>
           </div>

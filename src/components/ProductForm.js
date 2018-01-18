@@ -55,13 +55,13 @@ let ProductForm = (props) => {
         edit ? '' :
           <Fragment>
             <Field
-              label="Longitude: "
-              name="longitude"
-              component={renderField}
-            />
-            < Field
               label="Latitude: "
               name="latitude"
+              component={renderField}
+            />
+            <Field
+              label="Longitude: "
+              name="longitude"
               component={renderField}
             />
             <Field

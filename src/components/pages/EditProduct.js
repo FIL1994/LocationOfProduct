@@ -9,7 +9,7 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {reduxForm} from 'redux-form';
 import _ from 'lodash';
-import {Container, Button} from 'semantic-ui-react';
+import {Container, Button, Divider} from 'semantic-ui-react';
 
 import {getProduct, editProduct} from '../../actions';
 import ProductForm from '../ProductForm';
@@ -52,6 +52,8 @@ class EditProduct extends Component {
 
     return (
       <Container>
+        <h3 className="text-center">Edit Product</h3>
+        <Divider/>
         <ProductForm
           edit
           onSubmit={this.props.handleSubmit(this.onSubmit)}
@@ -59,11 +61,12 @@ class EditProduct extends Component {
         >
           <Button
             as={Link}
+            color="vk"
             to={`/location/${this.props.match.params.id}`}
             fluid
             style={{marginTop: 5}}
           >
-            View Locations
+            View Location History
           </Button>
         </ProductForm>
       </Container>

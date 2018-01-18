@@ -24,7 +24,7 @@ export default (props) => {
       <Segment {...props} inverted as="header" id="header">
         <Menu inverted secondary size="large">
           <Menu.Item>
-            <h3>Location of Product</h3>
+            <h3>Product Locator</h3>
           </Menu.Item>
           <Menu.Menu position="right">
             <Menu.Item as={NavLink} to="/" activeClassName="active" isActive={isLinkActive}>

@@ -32,3 +32,16 @@ body {
 form .rdt input {
   width: 100%;
 }
+
+.text-center {
+  text-align: center;
+}
+
+.ui.basic.button.no-hover {
+  pointer-events: none;
+}
+
+.ui.basic.button.no-hover:hover {
+  background-color: inherit !important;
+  cursor: initial;
+}

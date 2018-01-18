@@ -11,7 +11,7 @@ import {withGoogleMap, withScriptjs, GoogleMap, Polyline, Marker} from 'react-go
  * A component for showing a GoogleMap component with a Polyline and a Marker
  */
 export default withScriptjs(withGoogleMap((props) => {
-    const {lat, lng} = props;
+    const {lat, lng, isMarkerShown, startPosition} = props;
     const position = {lat, lng};
 
     return(
@@ -29,7 +29,22 @@ export default withScriptjs(withGoogleMap((props) => {
             strokeWeight: 2
           }}
         />
-        {props.isMarkerShown && <Marker position={position}/>}
+        {
+          isMarkerShown &&
+          <Marker
+            clickable={false}
+            label="Current"
+            position={position}
+          />
+        }
+        {
+          startPosition &&
+          <Marker
+            clickable={false}
+            label="Start"
+            position={startPosition}
+          />
+        }
       </GoogleMap>
     );
   }
