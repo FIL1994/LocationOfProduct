@@ -161,7 +161,7 @@ class ViewProduct extends Component {
           <Table.Header>
             <Table.Row>
               {
-                ["Datetime", "Latitude", "Longitude", "Elevation", "Actions"].map( h=>
+                ["Datetime", "Latitude", "Longitude", "Elevation", "Address", "Actions"].map( h=>
                   <Table.HeaderCell
                     key={`heading-${h}`}
                     onClick={() => this.onHeadingClicked(_.toLower(h))}
@@ -185,7 +185,7 @@ class ViewProduct extends Component {
           <Table.Body>
             <Table.Row>
               {
-                iArray(4).map((v, i) => <Table.Cell key={`cell-${i}`}/>)
+                iArray(5).map((v, i) => <Table.Cell key={`cell-${i}`}/>)
               }
               <Table.Cell>
                 <Button as={Link} to={`/location/${_key}/post`} fluid primary>
@@ -196,12 +196,13 @@ class ViewProduct extends Component {
             {
               // get set of locations based on selected page
               locations.slice((activePage*perPage)-perPage, (activePage * perPage) - 1)
-                .map(({datetime, elevation, latitude, longitude, key}) =>
+                .map(({datetime, elevation, latitude, longitude, address, key}) =>
                   <Table.Row key={key}>
                     <Table.Cell>{formatDate(datetime)}</Table.Cell>
                     <Table.Cell>{latitude}</Table.Cell>
                     <Table.Cell>{longitude}</Table.Cell>
                     <Table.Cell>{elevation}</Table.Cell>
+                    <Table.Cell>{address}</Table.Cell>
                     <Table.Cell>
                       <Button.Group fluid compact>
                         <Button

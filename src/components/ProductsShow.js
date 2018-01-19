@@ -54,7 +54,7 @@ class ProductsShow extends Component {
    * @param clickedColumn
    */
   onHeadingClicked(clickedColumn) {
-    if(clickedColumn === "Actions" || "Map") {
+    if(clickedColumn === "Actions" || clickedColumn === "Map") {
       return;
     }
     let {column, sortAsc} = this.state;
@@ -317,9 +317,7 @@ class ProductsShow extends Component {
           />
           <Button icon labelPosition="right" onClick={() => this.setState({sortAsc: !sortAsc})}>
             <Icon name={sortAsc ? "chevron up": "chevron down"}/>
-            {
-              sortAsc ? `Asc ` : 'Desc'
-            }
+            Order
           </Button>
         </Input>
       </Grid.Column>
