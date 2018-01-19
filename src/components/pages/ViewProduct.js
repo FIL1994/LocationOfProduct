@@ -10,7 +10,7 @@ import {connect} from 'react-redux';
 import _ from 'lodash';
 import Datetime from 'react-datetime';
 import moment from 'moment';
-import {Container, Grid, Pagination, Header, Form, Tab, Table, Button} from 'semantic-ui-react';
+import {Container, Grid, Pagination, Header, Form, Tab, Table, Button, Responsive} from 'semantic-ui-react';
 
 import {getProduct, editProduct} from '../../actions';
 import formatDate from '../../util/formatDate';
@@ -29,6 +29,7 @@ class ViewProduct extends Component {
 
     this.renderMap = this.renderMap.bind(this);
     this.renderTable = this.renderTable.bind(this);
+    this.onScreenSizeChange = _.debounce(this.onScreenSizeChange.bind(this), 20);
   }
 
   state = {
@@ -38,14 +39,30 @@ class ViewProduct extends Component {
     perPage: 15,
     column: "datetime",
     sortAsc: false,
-    maps: []
+    maps: [],
+    fluidActions: false
   };
+
   startDate;
   endDate;
 
   componentDidMount() {
     const {id} = this.props.match.params;
     this.props.getProduct(id);
+  }
+
+  onScreenSizeChange(e, {width}) {
+    if(width > 991) {
+      if(this.state.fluidActions) {
+        this.setState({
+          fluidActions: false
+        });
+      }
+    } else {
+      this.setState({
+        fluidActions: true
+      });
+    }
   }
 
   /**
@@ -118,6 +135,17 @@ class ViewProduct extends Component {
       locations
     );
 
+    // cast props to numbers
+    newLocations = newLocations.map(l => {
+      const {datetime, latitude, longitude, elevation} = l;
+      l.datetime = Number(datetime);
+      l.latitude = Number(latitude);
+      l.longitude = Number(longitude);
+      l.elevation = Number(elevation);
+
+      return l;
+    });
+
     newLocations = _.orderBy(
       newLocations,
       [column],
@@ -128,7 +156,7 @@ class ViewProduct extends Component {
   }
 
   renderTable() {
-    const {activePage, perPage} = this.state;
+    const {activePage, perPage, fluidActions} = this.state;
     const {product} = this.props;
     const {_key} = product;
     const locations = this.filterLocations(product.locations);
@@ -157,7 +185,7 @@ class ViewProduct extends Component {
         {this.renderFilterOptions()}
         <div style={{marginTop: 5}}/>
         {locationsPagination}
-        <Table celled selectable striped stackable verticalAlign="middle" textAlign="center">
+        <Table celled selectable striped stackable verticalAlign="middle" textAlign="center" fixed>
           <Table.Header>
             <Table.Row>
               {
@@ -196,36 +224,54 @@ class ViewProduct extends Component {
             {
               // get set of locations based on selected page
               locations.slice((activePage*perPage)-perPage, (activePage * perPage) - 1)
-                .map(({datetime, elevation, latitude, longitude, address, key}) =>
-                  <Table.Row key={key}>
+                .map(({datetime, elevation, latitude, longitude, address, key}) => {
+                  const buttonProps = !fluidActions ? {} : {
+                    fluid: true,
+                    style: {marginTop: 2}
+                  };
+
+                  const actions = (
+                    <Fragment>
+                      <Button
+                        color='yellow'
+                        as={Link}
+                        to={`/edit/${_key}/${key}`}
+                        {...buttonProps}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        color='red'
+                        onClick={() => {
+                          let newLocations = [...locations];
+                          newLocations.splice(key, 1);
+                          this.props.editProduct(_key, {locations: newLocations})
+                        }}
+                        {...buttonProps}
+                      >
+                        Delete
+                      </Button>
+                    </Fragment>
+                  );
+
+                  return <Table.Row key={key}>
                     <Table.Cell>{formatDate(datetime)}</Table.Cell>
                     <Table.Cell>{latitude}</Table.Cell>
                     <Table.Cell>{longitude}</Table.Cell>
                     <Table.Cell>{elevation}</Table.Cell>
                     <Table.Cell>{address}</Table.Cell>
                     <Table.Cell>
-                      <Button.Group fluid compact>
-                        <Button
-                          color='yellow'
-                          as={Link}
-                          to={`/edit/${_key}/${key}`}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          color='red'
-                          onClick={() => {
-                            let newLocations = [...locations];
-                            newLocations.splice(key, 1);
-                            this.props.editProduct(_key, {locations: newLocations})
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </Button.Group>
+                      <Responsive fireOnMount minWidth={992} onUpdate={this.onScreenSizeChange}>
+                        <Button.Group fluid compact>
+                          {actions}
+                        </Button.Group>
+                      </Responsive>
+                      <Responsive maxWidth={991}>
+                        {actions}
+                      </Responsive>
                     </Table.Cell>
                   </Table.Row>
-                )
+                })
             }
           </Table.Body>
         </Table>
