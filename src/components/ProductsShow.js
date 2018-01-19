@@ -8,7 +8,7 @@ import React, {Component, Fragment} from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import _ from 'lodash';
-import {Grid, Pagination, Button, Table, Input, Message, Select, Icon, Image} from 'semantic-ui-react';
+import {Grid, Pagination, Button, Table, Input, Message, Select, Icon, Image, Card} from 'semantic-ui-react';
 
 import {getProducts, deleteProduct} from '../actions';
 import {formatDate, tryCatch, getStaticMapURL, iterableArray as iArray} from '../util';
@@ -118,6 +118,18 @@ class ProductsShow extends Component {
         return send ? p : false;
       }));
     }
+
+    // cast props to numbers
+    productsToReturn = productsToReturn.map(p => {
+      const {_key, datetime, latitude, longitude, elevation} = p;
+      p._key = Number(_key);
+      p.datetime = Number(datetime);
+      p.latitude = Number(latitude);
+      p.longitude = Number(longitude);
+      p.elevation = Number(elevation);
+
+      return p;
+    });
 
     // sort the products by the selected column and order
     productsToReturn = _.orderBy(
@@ -277,6 +289,64 @@ class ProductsShow extends Component {
           </Table.Body>
         </Table>
         {productsPagination}
+        <Card.Group className="centered">
+        {
+          products.slice((activePage*perPage)-perPage, (activePage * perPage) - 1)
+            .map(({_key: key, description, datetime, longitude: lng, latitude: lat, elevation}) => {
+              const productLink = `/location/${key}`;
+                return (
+                  <Card key={key} link>
+                    <Image
+                      as={Link}
+                      to={productLink}
+                      src={getStaticMapURL({lat, lng}, [290, 195])}
+                      alt="map"
+                      rounded
+                    />
+                    <Card.Content as={Link} to={productLink}>
+                      <Card.Header>
+                        {description}
+                      </Card.Header>
+                      <Card.Meta>
+                        {key} <br/>
+                        {formatDate(datetime)}
+                      </Card.Meta>
+                      <Card.Description>
+                        Lat: {lat} |
+                        Lng: {lng} |
+                        Elev: {elevation}
+                      </Card.Description>
+                    </Card.Content>
+                    <Card.Content extra>
+                      <div className="ui three buttons">
+                        <Button
+                          color='teal'
+                          as={Link}
+                          to={productLink}
+                        >
+                          History
+                        </Button>
+                        <Button
+                          color='yellow'
+                          as={Link}
+                          to={`/edit/${key}`}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          color='red'
+                          onClick={() => this.props.deleteLocation(key)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </Card.Content>
+                  </Card>
+                )
+              }
+              )
+        }
+        </Card.Group>
       </Fragment>
     );
   }
