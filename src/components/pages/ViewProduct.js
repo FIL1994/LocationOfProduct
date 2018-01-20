@@ -52,8 +52,12 @@ class ViewProduct extends Component {
 
     const checkSticky = () => {
       const {isSticky} = this.state;
-      if(document.body.scrollHeight > window.innerHeight) {
-        if(!isSticky) {
+
+      const bodyHeight = document.body.scrollHeight;
+      const windowHeight = window.innerHeight;
+
+      if(bodyHeight > windowHeight && windowHeight > 450) {
+        if(!isSticky && (windowHeight / bodyHeight) < 0.55) {
           this.setState({isSticky: true});
         }
       } else if(isSticky) {
@@ -63,7 +67,11 @@ class ViewProduct extends Component {
 
     window.onresize = _.debounce(checkSticky, 100);
     checkSticky();
-    setTimeout(checkSticky, 200);
+  }
+
+  componentDidUpdate() {
+    // new content may have changed the document body's height
+    window.onresize();
   }
 
   componentWillUnmount() {

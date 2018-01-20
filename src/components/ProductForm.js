@@ -8,12 +8,16 @@ import React, {Component, Fragment} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Link} from "react-router-dom";
-import {Field, change} from 'redux-form';
+import {Field} from 'redux-form';
 import {Form, Button, Message} from 'semantic-ui-react';
 
+import {tryCatch} from '../util';
 import SelectLocationMap from './SelectLocationMap';
 import {GOOGLE_MAPS_KEY} from '../config/keys';
 import {changeFormField} from '../actions';
+
+const defaultLat = 43.542;
+const defaultLng = -80.242;
 
 function renderField(field) {
   const {meta : {touched, error}} = field;
@@ -22,6 +26,7 @@ function renderField(field) {
   return(
     <div className={className}>
       <Form.Input
+        fluid
         label={field.label}
         placeholder={field.input.name}
         {...field.input}
@@ -38,6 +43,31 @@ function renderField(field) {
   );
 }
 
+// must be stateful so it doesn't loose focus on re-render
+class LngInput extends Component {
+  render() {
+    return (
+      <Form.Input
+        fluid
+        label={"Longitude: "}
+        {...this.props.input}
+      />
+    );
+  }
+}
+
+class LatInput extends Component {
+  render() {
+    return (
+      <Form.Input
+        fluid
+        label={"Latitude: "}
+        {...this.props.input}
+      />
+    );
+  }
+}
+
 /**
  * A component for showing a form for a product
  * @param props
@@ -46,14 +76,16 @@ function renderField(field) {
  */
 class ProductForm extends Component {
   state = {
-    lat: this.props.lat || 43.542,
-    lng: this.props.lng || -80.242
+    lat: this.props.lat || defaultLat,
+    lng: this.props.lng || defaultLng
   };
 
-  componentDidUpdate() {
-    this.props.changeFormField(this.props.formName, 'latitude', _.toString(this.state.lat));
-    this.props.changeFormField(this.props.formName, 'longitude', _.toString(this.state.lng));
-  }
+  onMapDrag = ({lat, lng}) => {
+    this.setState({lat, lng});
+
+    this.props.changeFormField(this.props.formName, 'latitude', _.toString(lat));
+    this.props.changeFormField(this.props.formName, 'longitude', _.toString(lng));
+  };
 
   render() {
     const {edit, location, cancelRoute, submittingPost, children} = this.props;
@@ -79,29 +111,37 @@ class ProductForm extends Component {
           edit ? '' :
             <Fragment>
               <Field
-                label="Latitude: "
-                name="latitude"
-                component={renderField}
-                onChange={({target: {value}}) => this.setState({lat: Number(value)})}
-              />
-              <Field
-                label="Longitude: "
-                name="longitude"
-                component={renderField}
-                onChange={({target: {value}}) => this.setState({lng: Number(value)})}
-              />
-              <Field
                 label="Elevation: "
                 name="elevation"
                 component={renderField}
               />
+              <Form.Group widths='equal'>
+                <Field
+                  name="latitude"
+                  component={LatInput}
+                  onChange={
+                    ({target: {value}}) => this.setState({lat: value})
+                  }
+                />
+                <Field
+                  name="longitude"
+                  component={LngInput}
+                  onChange={
+                    ({target: {value}}) => this.setState({lng: value})
+                  }
+                />
+              </Form.Group>
               <div className="field">
                 <label>Select Location:</label>
                 <SelectLocationMap
                   apiKey={GOOGLE_MAPS_KEY}
-                  onDrag={({lat, lng}) => this.setState({lat, lng})}
-                  lat={this.state.lat}
-                  lng={this.state.lng}
+                  onDrag={this.onMapDrag}
+                  lat={
+                    tryCatch(() => Number(this.state.lat) || defaultLat, defaultLat)
+                  }
+                  lng={
+                    tryCatch(() => Number(this.state.lng) || defaultLng, defaultLng)
+                  }
                 />
               </div>
             </Fragment>
