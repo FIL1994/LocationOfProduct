@@ -10,7 +10,7 @@ import {reduxForm} from 'redux-form';
 import _ from 'lodash';
 import {Container, Divider} from 'semantic-ui-react';
 
-import {getProduct, getLocation, editProduct} from '../../actions';
+import {getProduct, getLocation, editProduct, clearLocation} from '../../actions';
 import ProductForm from '../ProductForm';
 import DefaultLoader from '../DefaultLoader';
 import DatetimeField from '../DatetimeField';
@@ -42,8 +42,11 @@ class EditLocation extends Component {
     // get location when product is accessible
     if(!_.isEmpty(product) && !this.state.gotLocation) {
       const {index} = this.props.match.params;
-      this.props.getLocation(product, index);
       this.setState({gotLocation: true});
+
+      this.props.clearLocation(
+        () => this.props.getLocation(product, index)
+      );
     }
   }
 
@@ -64,11 +67,17 @@ class EditLocation extends Component {
   }
 
   render() {
-    const {product, location, location: {datetime}} = this.props;
+    const {product, product: {_key}, location} = this.props;
+    const {id} = this.props.match.params;
 
-    if(_.isEmpty(product) || _.isEmpty(location)) {
+    if(_.isEmpty(product) || _.isEmpty(location) || _key.toString() !== id.toString()) {
       return <DefaultLoader/>;
     }
+
+    const {datetime} = location;
+    let {latitude, longitude} = location;
+    latitude = Number(latitude);
+    longitude = Number(longitude);
 
     return(
       <Container>
@@ -80,6 +89,8 @@ class EditLocation extends Component {
           onSubmit={this.props.handleSubmit(this.onSubmit)}
           submittingPost={this.state.submittingPost}
           cancelRoute={`/location/${this.props.match.params.id}`}
+          lat={latitude}
+          lng={longitude}
         >
           {
             datetime === undefined ? '' :
@@ -140,7 +151,7 @@ EditLocation = connect(
     product: state.product,
     location: state.location
   }),
-  {getProduct, getLocation, editProduct}
+  {getProduct, getLocation, editProduct, clearLocation}
 )(EditLocation);
 
 export default EditLocation;

@@ -6,7 +6,8 @@
  */
 import axios from 'axios';
 import
-  {GET_PRODUCTS, FAIL_PRODUCTS, CREATE_PRODUCT, GET_PRODUCT, FAIL_PRODUCT, DELETE_PRODUCT, GET_LOCATION}
+  {GET_PRODUCTS, FAIL_PRODUCTS, CREATE_PRODUCT, GET_PRODUCT, FAIL_PRODUCT, DELETE_PRODUCT, GET_LOCATION,
+    CLEAR_LOCATION}
     from './types';
 import {change} from 'redux-form';
 
@@ -140,6 +141,14 @@ export function getLocation(product, index) {
   return {
     type: GET_LOCATION,
     payload: product.locations[index]
+  };
+}
+
+export function clearLocation(callback = _.noop) {
+  setTimeout(callback, 100);
+
+  return {
+    type: CLEAR_LOCATION
   };
 }
 // region

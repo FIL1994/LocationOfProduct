@@ -52,7 +52,7 @@ class DefaultLoader extends Component {
     return(
       <Fragment>
         <div style={{marginTop: 50}}/>
-        <Loader size="large" active content='Loading' {...myProps}/>
+        <Loader indeterminate={true} size="large" active content='Loading' {...myProps}/>
       </Fragment>
     );
   }
