@@ -10,12 +10,10 @@ import {connect} from 'react-redux';
 import _ from 'lodash';
 import Datetime from 'react-datetime';
 import moment from 'moment';
-import {Container, Grid, Pagination, Header, Form, Tab, Table, Button, Responsive} from 'semantic-ui-react';
+import {Container, Grid, Pagination, Header, Form, Tab, Table, Button, Responsive, Sticky, Segment} from 'semantic-ui-react';
 
 import {getProduct, editProduct} from '../../actions';
-import formatDate from '../../util/formatDate';
-import tryCatch from '../../util/tryCatch';
-import iArray from '../../util/iterableArray';
+import {formatDate, tryCatch, iterableArray as iArray} from '../../util';
 import MyMap from '../MyMap';
 import DefaultLoader from '../DefaultLoader';
 import {GOOGLE_MAPS_KEY} from "../../config/keys";
@@ -40,7 +38,9 @@ class ViewProduct extends Component {
     column: "datetime",
     sortAsc: false,
     maps: [],
-    fluidActions: false
+    fluidActions: false,
+    showTable: true,
+    isSticky: false
   };
 
   startDate;
@@ -49,6 +49,25 @@ class ViewProduct extends Component {
   componentDidMount() {
     const {id} = this.props.match.params;
     this.props.getProduct(id);
+
+    const checkSticky = () => {
+      const {isSticky} = this.state;
+      if(document.body.scrollHeight > window.innerHeight) {
+        if(!isSticky) {
+          this.setState({isSticky: true});
+        }
+      } else if(isSticky) {
+        this.setState({isSticky: false});
+      }
+    };
+
+    window.onresize = _.debounce(checkSticky, 100);
+    checkSticky();
+    setTimeout(checkSticky, 200);
+  }
+
+  componentWillUnmount() {
+    window.onresize = null;
   }
 
   onScreenSizeChange(e, {width}) {
@@ -283,7 +302,7 @@ class ViewProduct extends Component {
   renderMap() {
     const {product} = this.props;
     const {_key} = product;
-    const locations = this.filterLocations(product.locations);
+    const locations = _.sortBy(product.locations, "datetime");
 
     const {latitude, longitude} = locations.slice(-1)[0];
     const {latitude: startLatitude, longitude: startLongitude} = locations[0];
@@ -349,7 +368,10 @@ class ViewProduct extends Component {
     );
   }
 
+  page;
+
   render() {
+    const {showTable, isSticky} = this.state;
     const {product} = this.props;
     const {description} = product;
 
@@ -357,17 +379,47 @@ class ViewProduct extends Component {
       return <DefaultLoader/>;
     }
 
+    const wrapSticky = (element) => {
+      if(isSticky) {
+        return (
+          <Sticky context={this.page} pushing className="sticky">
+            {element}
+          </Sticky>
+        );
+      } else {
+        return element;
+      }
+    };
+
     return(
-    <Container textAlign="center">
-      <Header as="h3">{description}</Header>
-      <Tab
-        menu={{secondary: true, pointing: true}}
-        panes={[
-          {menuItem: 'Table', render: this.renderTable},
-          {menuItem: 'Map', render: this.renderMap}
-        ]}
-      />
-    </Container>
+      <Fragment>
+        {wrapSticky(
+          <div style={{marginBottom: 10}}>
+            <Segment style={{marginBottom: 0, borderRadius: 0, marginTop: 0}} textAlign="center" inverted color="teal">
+              <Header as="h3" >{description}</Header>
+            </Segment>
+            <Button.Group fluid>
+            <Button
+            content="Table"
+            style={{borderRadius: 0}}
+            primary={showTable}
+            onClick={() => !showTable && this.setState({showTable: true})}
+            />
+            <Button
+            content="Map"
+            style={{borderRadius: 0}}
+            primary={!showTable}
+            onClick={() => showTable && this.setState({showTable: false})}
+            />
+            </Button.Group>
+          </div>
+        )}
+        <div ref={r => this.page = r}>
+        <Container textAlign="center">
+          {showTable ? this.renderTable() : this.renderMap()}
+        </Container>
+        </div>
+      </Fragment>
     );
   }
 }

@@ -15,6 +15,7 @@ import {getProduct, editProduct} from '../../actions';
 import ProductForm from '../ProductForm';
 import DefaultLoader from '../DefaultLoader';
 
+const formName = 'EditProductForm';
 /**
  * A component for editing a product
  */
@@ -55,6 +56,7 @@ class EditProduct extends Component {
         <h3 className="text-center">Edit Product</h3>
         <Divider/>
         <ProductForm
+          formName={formName}
           edit
           onSubmit={this.props.handleSubmit(this.onSubmit)}
           submittingPost={this.state.submittingPost}
@@ -87,7 +89,7 @@ function validate(values) {
 
 EditProduct = reduxForm({
   validate,
-  form: 'EditProductForm',
+  form: formName,
   enableReinitialize: true
 })(EditProduct);
 

@@ -13,6 +13,7 @@ import {createProducts} from '../../actions';
 import ProductForm from '../ProductForm';
 import DatetimeField from '../DatetimeField';
 
+const formName = 'NewProductForm';
 /**
  * A component for creating a product
  */
@@ -46,6 +47,7 @@ class CreateProduct extends Component {
         <h3 className="text-center">Create Product</h3>
         <Divider/>
         <ProductForm
+          formName={formName}
           onSubmit={this.props.handleSubmit(this.onSubmit)}
           submittingPost={this.state.submittingPost}
         >
@@ -94,7 +96,7 @@ function validate(values) {
 
 export default reduxForm({
   validate,
-  form: 'NewProductForm'
+  form: formName
 })(
   connect(null, {createProducts})(CreateProduct)
 );

@@ -8,6 +8,7 @@ import axios from 'axios';
 import
   {GET_PRODUCTS, FAIL_PRODUCTS, CREATE_PRODUCT, GET_PRODUCT, FAIL_PRODUCT, DELETE_PRODUCT, GET_LOCATION}
     from './types';
+import {change} from 'redux-form';
 
 // the url for the api
 const ROOT_URL = "http://45.77.106.244:7131/data";
@@ -142,3 +143,9 @@ export function getLocation(product, index) {
   };
 }
 // region
+
+export function changeFormField(form, field, value) {
+  return dispatch => dispatch(
+    change(form, field, value)
+  );
+}

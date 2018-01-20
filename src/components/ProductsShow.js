@@ -8,10 +8,10 @@ import React, {Component, Fragment} from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import _ from 'lodash';
-import {Grid, Pagination, Button, Table, Input, Message, Select, Icon, Image, Card} from 'semantic-ui-react';
+import {Grid, Pagination, Button, Input, Message, Select, Icon, Image, Card, Divider, Segment, Popup} from 'semantic-ui-react';
 
 import {getProducts, deleteProduct} from '../actions';
-import {formatDate, tryCatch, getStaticMapURL, iterableArray as iArray} from '../util';
+import {formatDate, tryCatch, getStaticMapURL} from '../util';
 import DefaultLoader from './DefaultLoader';
 import {GOOGLE_MAPS_KEY} from '../config/keys';
 
@@ -33,9 +33,10 @@ class ProductsShow extends Component {
     query: undefined,
     products: undefined,
     activePage: 1,
-    perPage: 10,
+    perPage: 6,
     column: "_id",
-    sortAsc: false
+    sortAsc: false,
+    topVisible: false
   };
 
   componentDidMount() {
@@ -141,6 +142,108 @@ class ProductsShow extends Component {
     return productsToReturn;
   }
 
+  renderCards(products) {
+    const {activePage, perPage} = this.state;
+
+    return (
+      <Card.Group className="centered" style={{marginTop: 5, marginBottom: 5}}>
+        {
+          products.slice((activePage*perPage)-perPage, (activePage * perPage))
+            .map(({_key: key, description, datetime, longitude: lng, latitude: lat, elevation, address}) => {
+                const productLink = `/location/${key}`;
+                return (
+                  <Card key={key} link>
+                    <Image
+                      as={Link}
+                      to={productLink}
+                      src={getStaticMapURL({lat, lng}, [290, 163])}
+                      alt="map"
+                      rounded
+                    />
+                    <Card.Content as={Link} to={productLink}>
+                      <Card.Header>
+                        {description}
+                      </Card.Header>
+                      <Card.Meta>
+                        {key} <br/>
+                        {formatDate(datetime)}
+                      </Card.Meta>
+                      <Card.Description>
+                        {address} <br/>
+                        <Divider/>
+                        Lat: {lat} |
+                        Lng: {lng} |
+                        Elev: {elevation}
+                      </Card.Description>
+                    </Card.Content>
+                    <Card.Content extra>
+                      <div className="ui three buttons">
+                        <Button
+                          color='teal'
+                          as={Link}
+                          to={productLink}
+                          content='History'
+                        />
+                        <Button
+                          color='yellow'
+                          as={Link}
+                          to={`/edit/${key}`}
+                          content='Edit'
+                        />
+                        <Popup
+                          hideOnScroll
+                          inverted
+                          content={
+                            <Fragment>
+                              <span style={{marginRight: 5}}>Are you sure?</span>
+                              <Button
+                                compact
+                                color='red'
+                                onClick={() => this.props.deleteLocation(key)}
+                                content='Yes'
+                              />
+                            </Fragment>
+                          }
+                          on='click'
+                          trigger={
+                            <Button
+                              color='red'
+                              content='Delete'
+                            />
+                          }
+                        />
+                      </div>
+                    </Card.Content>
+                  </Card>
+                )
+              }
+            )
+        }
+      </Card.Group>
+    );
+  }
+
+  renderResultsPerPage() {
+    const {perPage} = this.state;
+
+    return (
+      <Segment as="span" compact>
+          <span style={{marginRight: 8, verticalAlign: "middle"}}>
+            Results Per Page:
+          </span>
+        <Button.Group style={{marginTop: 5}}>
+          {
+            [6, 12, 18].map(i => (
+              <Button key={i} primary={perPage === i} onClick={() => this.setState({perPage: i})}>
+                {i}
+              </Button>
+            ))
+          }
+        </Button.Group>
+      </Segment>
+    );
+  }
+
   renderLocations() {
     const products = this.filterProducts(this.props.products);
 
@@ -181,172 +284,8 @@ class ProductsShow extends Component {
     return(
       <Fragment>
         {productsPagination}
-        <Table celled selectable striped stackable verticalAlign="middle" textAlign="center">
-          <Table.Header>
-            <Table.Row>
-              {
-                [
-                  "Map",
-                  [<Fragment>
-                    {'ID '}
-                    {this.renderIcon('_id', false)}
-                  </Fragment>, '_id'],
-                  [<Fragment>
-                    {'Description '}
-                    {this.renderIcon('description', true)}
-                  </Fragment>, 'description'],
-                  [<Fragment>
-                    {'Datetime '}
-                    {this.renderIcon('datetime', false)}
-                  </Fragment>, 'datetime'],
-                  [<Fragment>
-                    {'Latitude '}
-                    {this.renderIcon('latitude', false)}
-                  </Fragment>, 'latitude'],
-                  [<Fragment>
-                    {'Longitude '}
-                    {this.renderIcon('longitude', false)}
-                  </Fragment>, 'longitude'],
-                  [<Fragment>
-                    {'Elevation '}
-                    {this.renderIcon('elevation', false)}
-                  </Fragment>, 'elevation'],
-                  "Actions"
-                ].map(h =>
-                  _.isArray(h)
-                    ?
-                    <Table.HeaderCell
-                      key={`heading-${h[1]}`}
-                      onClick={() => this.onHeadingClicked(h[1])}
-                      style={{cursor: "pointer"}}
-                    >
-                      {h[0]}
-                    </Table.HeaderCell>
-                    :
-                    <Table.HeaderCell
-                      key={`heading-${h}`}
-                    >
-                      {h}
-                    </Table.HeaderCell>
-                )
-              }
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-          <Table.Row>
-            {iArray(7).map((v, i) => <Table.Cell key={`cell-${i}`}/>)}
-            <Table.Cell>
-              <Button as={Link} to="post" fluid primary>Add Product</Button>
-            </Table.Cell>
-          </Table.Row>
-            {
-              // get set of products based on selected page
-              products.slice((activePage*perPage)-perPage, (activePage * perPage) - 1)
-                .map(({_key: key, description, datetime, longitude: lng, latitude: lat, elevation}) =>
-                  <Table.Row key={key}>
-                    <td>
-                      <Image
-                        as={Link}
-                        to={`/location/${key}`}
-                        src={getStaticMapURL({lat, lng}, [150, 100])}
-                        alt="map"
-                        rounded
-                      />
-                    </td>
-                    <td>{key}</td>
-                    <td>{description}</td>
-                    <td>{formatDate(datetime)}</td>
-                    <td>{lat}</td>
-                    <td>{lng}</td>
-                    <td>{elevation}</td>
-                    <td>
-                      <Button.Group fluid compact>
-                        <Button
-                          color='teal'
-                          as={Link}
-                          to={`/location/${key}`}
-                        >
-                          History
-                        </Button>
-                        <Button
-                          color='yellow'
-                          as={Link}
-                          to={`/edit/${key}`}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          color='red'
-                          onClick={() => this.props.deleteLocation(key)}
-                        >
-                          Delete
-                        </Button>
-                      </Button.Group>
-                    </td>
-                  </Table.Row>
-              )
-            }
-          </Table.Body>
-        </Table>
+        {this.renderCards(products)}
         {productsPagination}
-        <Card.Group className="centered">
-        {
-          products.slice((activePage*perPage)-perPage, (activePage * perPage) - 1)
-            .map(({_key: key, description, datetime, longitude: lng, latitude: lat, elevation}) => {
-              const productLink = `/location/${key}`;
-                return (
-                  <Card key={key} link>
-                    <Image
-                      as={Link}
-                      to={productLink}
-                      src={getStaticMapURL({lat, lng}, [290, 195])}
-                      alt="map"
-                      rounded
-                    />
-                    <Card.Content as={Link} to={productLink}>
-                      <Card.Header>
-                        {description}
-                      </Card.Header>
-                      <Card.Meta>
-                        {key} <br/>
-                        {formatDate(datetime)}
-                      </Card.Meta>
-                      <Card.Description>
-                        Lat: {lat} |
-                        Lng: {lng} |
-                        Elev: {elevation}
-                      </Card.Description>
-                    </Card.Content>
-                    <Card.Content extra>
-                      <div className="ui three buttons">
-                        <Button
-                          color='teal'
-                          as={Link}
-                          to={productLink}
-                        >
-                          History
-                        </Button>
-                        <Button
-                          color='yellow'
-                          as={Link}
-                          to={`/edit/${key}`}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          color='red'
-                          onClick={() => this.props.deleteLocation(key)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </Card.Content>
-                  </Card>
-                )
-              }
-              )
-        }
-        </Card.Group>
       </Fragment>
     );
   }
@@ -394,20 +333,42 @@ class ProductsShow extends Component {
     );
   }
 
-  render() {
-    return(
-      <Grid textAlign="center">
-        <Grid.Row>
-          <Grid.Column width={16}>
+  render = () => (
+    <Grid textAlign="center">
+      <Grid.Row>
+        <Grid.Column width={16}>
           {this.renderFilterOptions()}
-          </Grid.Column>
-        </Grid.Row>
-        <Grid.Row style={{marginTop: -15}}>
-          {this.renderLocations()}
-        </Grid.Row>
-      </Grid>
-    );
-  }
+        </Grid.Column>
+      </Grid.Row>
+      <Grid.Row style={{marginTop: -15}}>
+        {this.renderLocations()}
+      </Grid.Row>
+      <Grid.Row>
+        {_.isEmpty(this.props.products) ? '' : this.renderResultsPerPage()}
+        <Popup
+          hideOnScroll
+          inverted
+          content='Add New Product'
+          trigger={
+            <Button
+              as={Link}
+              to="/post"
+              icon="plus"
+              circular
+              color="blue"
+              size="massive"
+              style={{
+                position: "fixed",
+                zIndex: "6",
+                right: "2.5%",
+                bottom: "2.5%"
+              }}
+            />
+          }
+        />
+      </Grid.Row>
+    </Grid>
+  );
 }
 
 function mapStateToProps(state) {

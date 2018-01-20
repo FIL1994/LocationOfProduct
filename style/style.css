@@ -4,7 +4,12 @@ body {
 
 #header {
   margin-top: 0;
+  margin-bottom: 0;
   border-radius: 0;
+}
+
+div.ui.container {
+  margin-top: 5px;
 }
 
 #footer {
@@ -37,11 +42,16 @@ form .rdt input {
   text-align: center;
 }
 
-.ui.basic.button.no-hover {
+span.ui.basic.button.no-hover {
   pointer-events: none;
 }
 
 .ui.basic.button.no-hover:hover {
   background-color: inherit !important;
   cursor: initial;
+}
+
+.sticky {
+  z-index: 1;
+  position: relative;
 }

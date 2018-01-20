@@ -5,7 +5,7 @@
  * @date 2018-01-13
  */
 import React from 'react';
-import {NavLink} from 'react-router-dom';
+import {NavLink, Link} from 'react-router-dom';
 import {Menu, Segment} from 'semantic-ui-react';
 
 function isLinkActive(match) {
@@ -24,7 +24,7 @@ export default (props) => {
       <Segment {...props} inverted as="header" id="header">
         <Menu inverted secondary size="large">
           <Menu.Item>
-            <h3>Product Locator</h3>
+            <Link to="/">Product Locator</Link>
           </Menu.Item>
           <Menu.Menu position="right">
             <Menu.Item as={NavLink} to="/" activeClassName="active" isActive={isLinkActive}>

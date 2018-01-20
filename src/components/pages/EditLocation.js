@@ -15,6 +15,7 @@ import ProductForm from '../ProductForm';
 import DefaultLoader from '../DefaultLoader';
 import DatetimeField from '../DatetimeField';
 
+const formName = 'EditLocationForm';
 /**
  * A component for editing a location.
  */
@@ -63,9 +64,9 @@ class EditLocation extends Component {
   }
 
   render() {
-    const {product, location: {datetime}} = this.props;
+    const {product, location, location: {datetime}} = this.props;
 
-    if(!product) {
+    if(_.isEmpty(product) || _.isEmpty(location)) {
       return <DefaultLoader/>;
     }
 
@@ -74,6 +75,7 @@ class EditLocation extends Component {
         <h3 className="text-center">Edit Location</h3>
         <Divider/>
         <ProductForm
+          formName={formName}
           location
           onSubmit={this.props.handleSubmit(this.onSubmit)}
           submittingPost={this.state.submittingPost}
@@ -128,7 +130,7 @@ function validate(values) {
 
 EditLocation = reduxForm({
   validate,
-  form: 'EditLocationForm',
+  form: formName,
   enableReinitialize: true
 })(EditLocation);
 

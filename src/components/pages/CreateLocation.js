@@ -14,7 +14,9 @@ import {getProduct, editProduct} from '../../actions';
 import ProductForm from '../ProductForm';
 import DefaultLoader from '../DefaultLoader';
 import DatetimeField from '../DatetimeField';
+import {tryCatch} from '../../util';
 
+const formName = 'CreateLocationForm';
 /**
  * A component for creating a location and adding it to a product
  */
@@ -51,19 +53,27 @@ class CreateLocation extends Component {
   }
 
   render() {
-    if(!this.props.product) {
+    if(_.isEmpty(this.props.product)) {
       return <DefaultLoader/>;
     }
+
+    // get the lat and lng of the latest location
+    let {latitude, longitude} = tryCatch(() => this.props.product.locations.slice(-1)[0], {});
+    latitude = Number(latitude);
+    longitude = Number(longitude);
 
     return (
       <Container>
         <h3 className="text-center">Create Location</h3>
         <Divider/>
         <ProductForm
+          formName={formName}
           location
           onSubmit={this.props.handleSubmit(this.onSubmit)}
           submittingPost={this.state.submittingPost}
           cancelRoute={`/location/${this.props.match.params.id}`}
+          lat={latitude}
+          lng={longitude}
         >
           <DatetimeField/>
         </ProductForm>
@@ -107,7 +117,7 @@ function validate(values) {
 
 CreateLocation = reduxForm({
   validate,
-  form: 'CreateLocationForm'
+  form: formName
 })(CreateLocation);
 
 CreateLocation = connect(
