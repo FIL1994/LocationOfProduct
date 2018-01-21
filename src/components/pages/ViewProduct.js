@@ -18,6 +18,7 @@ import {getProduct, editProduct} from '../../actions';
 import {formatDate, tryCatch, iterableArray as iArray} from '../../util';
 import MyMap from '../MyMap';
 import DefaultLoader from '../DefaultLoader';
+import ResultsPerPage from '../ResultsPerPage';
 import {GOOGLE_MAPS_KEY} from "../../config/keys";
 
 /**
@@ -36,7 +37,7 @@ class ViewProduct extends Component {
     startDate: undefined,
     endDate: undefined,
     activePage: 1,
-    perPage: 15,
+    perPage: 10,
     column: "datetime",
     sortAsc: false,
     maps: [],
@@ -194,6 +195,12 @@ class ViewProduct extends Component {
       () => _.ceil(locations.length / perPage),
       0
     );
+
+    if(totalPages < activePage) {
+      setTimeout(
+        () => this.setState({activePage: totalPages})
+      );
+    }
 
     // only show pagination if there is more than 1 page
     const locationsPagination = totalPages < 2 ? '' :
@@ -396,7 +403,7 @@ class ViewProduct extends Component {
   page;
 
   render() {
-    const {showTable, isSticky} = this.state;
+    const {showTable, isSticky, perPage} = this.state;
     const {product} = this.props;
     const {description} = product;
 
@@ -425,23 +432,34 @@ class ViewProduct extends Component {
             </Segment>
             <Button.Group fluid>
             <Button
-            content="Table"
-            style={{borderRadius: 0}}
-            primary={showTable}
-            onClick={() => !showTable && this.setState({showTable: true})}
+              content="Table"
+              style={{borderRadius: 0}}
+              primary={showTable}
+              onClick={() => !showTable && this.setState({showTable: true})}
             />
             <Button
-            content="Map"
-            style={{borderRadius: 0}}
-            primary={!showTable}
-            onClick={() => showTable && this.setState({showTable: false})}
+              content="Map"
+              style={{borderRadius: 0}}
+              primary={!showTable}
+              onClick={() => showTable && this.setState({showTable: false})}
             />
             </Button.Group>
           </div>
         )}
         <div ref={r => this.page = r}>
         <Container textAlign="center">
-          {showTable ? this.renderTable() : this.renderMap()}
+          {!showTable ? this.renderMap() :
+            <Fragment>
+              {this.renderTable()}
+              <Grid textAlign="center" style={{marginTop: 10, marginBottom: 5}}>
+                <ResultsPerPage
+                  perPage={perPage}
+                  values={[5, 10, 20, 30, 50, 100]}
+                  onClick={perPage => this.setState({perPage})}
+                />
+              </Grid>
+            </Fragment>
+          }
         </Container>
         </div>
       </Fragment>

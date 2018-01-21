@@ -13,6 +13,7 @@ import {Grid, Pagination, Button, Input, Message, Select, Icon, Image, Card, Div
 import {getProducts, deleteProduct} from '../actions';
 import {formatDate, tryCatch, getStaticMapURL} from '../util';
 import DefaultLoader from './DefaultLoader';
+import ResultsPerPage from './ResultsPerPage';
 import {GOOGLE_MAPS_KEY} from '../config/keys';
 
 getStaticMapURL.setKey(GOOGLE_MAPS_KEY);
@@ -223,27 +224,6 @@ class ProductsShow extends Component {
     );
   }
 
-  renderResultsPerPage() {
-    const {perPage} = this.state;
-
-    return (
-      <Segment as="span" compact>
-          <span style={{marginRight: 8, verticalAlign: "middle"}}>
-            Results Per Page:
-          </span>
-        <Button.Group style={{marginTop: 5}}>
-          {
-            [6, 12, 18].map(i => (
-              <Button key={i} primary={perPage === i} onClick={() => this.setState({perPage: i})}>
-                {i}
-              </Button>
-            ))
-          }
-        </Button.Group>
-      </Segment>
-    );
-  }
-
   renderLocations() {
     const products = this.filterProducts(this.props.products);
 
@@ -344,7 +324,13 @@ class ProductsShow extends Component {
         {this.renderLocations()}
       </Grid.Row>
       <Grid.Row>
-        {_.isEmpty(this.props.products) ? '' : this.renderResultsPerPage()}
+        {_.isEmpty(this.props.products) ? '' :
+          <ResultsPerPage
+            perPage={this.state.perPage}
+            values={[6, 12, 18]}
+            onClick={perPage => this.setState({perPage})}
+          />
+        }
         <Popup
           hideOnScroll
           inverted
