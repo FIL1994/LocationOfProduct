@@ -21,10 +21,10 @@ function isLinkActive(match) {
  */
 export default (props) => {
     return(
-      <Segment {...props} inverted as="header" id="header">
+      <Segment {...props} color="black" inverted as="header" id="header">
         <Menu inverted secondary size="large">
           <Menu.Item>
-            <Link to="/">Product Locator</Link>
+            <Link to="/" id="page-title">Product Locator</Link>
           </Menu.Item>
           <Menu.Menu position="right">
             <Menu.Item as={NavLink} to="/" activeClassName="active" isActive={isLinkActive}>

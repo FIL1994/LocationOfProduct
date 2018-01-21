@@ -10,7 +10,9 @@ import {connect} from 'react-redux';
 import _ from 'lodash';
 import Datetime from 'react-datetime';
 import moment from 'moment';
-import {Container, Grid, Pagination, Header, Form, Tab, Table, Button, Responsive, Sticky, Segment} from 'semantic-ui-react';
+import
+  {Container, Grid, Pagination, Header, Form, Tab, Table, Button, Responsive, Sticky, Segment, Popup}
+    from 'semantic-ui-react';
 
 import {getProduct, editProduct} from '../../actions';
 import {formatDate, tryCatch, iterableArray as iArray} from '../../util';
@@ -57,7 +59,7 @@ class ViewProduct extends Component {
       const windowHeight = window.innerHeight;
 
       if(bodyHeight > windowHeight && windowHeight > 450) {
-        if(!isSticky && (windowHeight / bodyHeight) < 0.55) {
+        if(!isSticky && (windowHeight / bodyHeight) < 0.72) {
           this.setState({isSticky: true});
         }
       } else if(isSticky) {
@@ -263,21 +265,36 @@ class ViewProduct extends Component {
                         color='yellow'
                         as={Link}
                         to={`/edit/${_key}/${key}`}
+                        content="Edit"
                         {...buttonProps}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        color='red'
-                        onClick={() => {
-                          let newLocations = [...locations];
-                          newLocations.splice(key, 1);
-                          this.props.editProduct(_key, {locations: newLocations})
-                        }}
-                        {...buttonProps}
-                      >
-                        Delete
-                      </Button>
+                      />
+                      <Popup
+                        hideOnScroll
+                        inverted
+                        content={
+                          <Fragment>
+                            <span style={{marginRight: 10}}>Are you sure?</span>
+                            <Button
+                              compact
+                              color='red'
+                              onClick={() => {
+                                let newLocations = [...locations];
+                                newLocations.splice(key, 1);
+                                this.props.editProduct(_key, {locations: newLocations})
+                              }}
+                              content='Yes'
+                            />
+                          </Fragment>
+                        }
+                        on='click'
+                        trigger={
+                          <Button
+                            color='red'
+                            content="Delete"
+                            {...buttonProps}
+                          />
+                        }
+                      />
                     </Fragment>
                   );
 

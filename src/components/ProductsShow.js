@@ -125,8 +125,8 @@ class ProductsShow extends Component {
       const {_key, datetime, latitude, longitude, elevation} = p;
       p._key = Number(_key);
       p.datetime = Number(datetime);
-      p.latitude = Number(latitude);
-      p.longitude = Number(longitude);
+      p.latitude = _.round(latitude, 2);
+      p.longitude = _.round(longitude, 2);
       p.elevation = Number(elevation);
 
       return p;
@@ -195,7 +195,7 @@ class ProductsShow extends Component {
                           inverted
                           content={
                             <Fragment>
-                              <span style={{marginRight: 5}}>Are you sure?</span>
+                              <span style={{marginRight: 10}}>Are you sure?</span>
                               <Button
                                 compact
                                 color='red'

@@ -5,7 +5,7 @@
  * @date 2018-01-15
  */
 import React from 'react';
-import {withGoogleMap, withScriptjs, GoogleMap, Polyline, Marker} from 'react-google-maps';
+import {withGoogleMap, withScriptjs, GoogleMap, Polyline, Marker, InfoWindow} from 'react-google-maps';
 
 /**
  * A component for showing a GoogleMap component with a Polyline and a Marker
@@ -30,20 +30,24 @@ export default withScriptjs(withGoogleMap((props) => {
           }}
         />
         {
-          isMarkerShown &&
-          <Marker
-            clickable={false}
-            label="Current"
-            position={position}
-          />
-        }
-        {
           startPosition &&
           <Marker
-            clickable={false}
-            label="Start"
             position={startPosition}
-          />
+          >
+            <InfoWindow>
+              <b>Start</b>
+            </InfoWindow>
+          </Marker>
+        }
+        {
+          isMarkerShown &&
+          <Marker
+            position={position}
+          >
+            <InfoWindow>
+              <b>Current</b>
+            </InfoWindow>
+          </Marker>
         }
       </GoogleMap>
     );
