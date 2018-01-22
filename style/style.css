@@ -61,8 +61,3 @@ span.ui.basic.button.no-hover {
   font-size: 1.2em;
   font-style: italic;
 }
-
-#page-title:hover {
-  opacity: 0.9;
-  background-color: #0a0a0a2b;
-}

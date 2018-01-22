@@ -23,8 +23,8 @@ export default (props) => {
     return(
       <Segment {...props} color="black" inverted as="header" id="header">
         <Menu inverted secondary size="large">
-          <Menu.Item>
-            <Link to="/" id="page-title">Product Locator</Link>
+          <Menu.Item as={Link} to="/" id="page-title">
+            Product Locator
           </Menu.Item>
           <Menu.Menu position="right">
             <Menu.Item as={NavLink} to="/" activeClassName="active" isActive={isLinkActive}>

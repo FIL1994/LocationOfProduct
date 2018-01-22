@@ -196,6 +196,7 @@ class ViewProduct extends Component {
       0
     );
 
+    // disallow the activePage to be more than the total pages
     if(totalPages < activePage) {
       setTimeout(
         () => this.setState({activePage: totalPages})
@@ -239,6 +240,9 @@ class ViewProduct extends Component {
                     {`${h} `}
                     {
                       h === "Actions" ? '' :
+                        h === "Address" ?
+                        this.renderIcon(_.toLower(h), true)
+                          :
                         this.renderIcon(_.toLower(h), false)
                     }
                   </Table.HeaderCell>
@@ -381,7 +385,7 @@ class ViewProduct extends Component {
                 utc
               />
             </Grid.Column>
-            <Grid.Column width={2} textAlign="center" style={{marginTop: 8}}>
+            <Grid.Column width={2} textAlign="center" style={{marginTop: 15}}>
               to
             </Grid.Column>
             <Grid.Column width={6}>
@@ -427,10 +431,15 @@ class ViewProduct extends Component {
       <Fragment>
         {wrapSticky(
           <div style={{marginBottom: 10}}>
-            <Segment style={{marginBottom: 0, borderRadius: 0, marginTop: 0}} textAlign="center" inverted color="teal">
+            <Segment
+              style={{marginBottom: 0, borderRadius: 0, marginTop: 0, height: 46}}
+              textAlign="center"
+              inverted
+              color="teal"
+            >
               <Header as="h3" >{description}</Header>
             </Segment>
-            <Button.Group fluid>
+            <Button.Group fluid compact>
             <Button
               content="Table"
               style={{borderRadius: 0}}
@@ -439,6 +448,7 @@ class ViewProduct extends Component {
             />
             <Button
               content="Map"
+              href="#"
               style={{borderRadius: 0}}
               primary={!showTable}
               onClick={() => showTable && this.setState({showTable: false})}
@@ -454,7 +464,7 @@ class ViewProduct extends Component {
               <Grid textAlign="center" style={{marginTop: 10, marginBottom: 5}}>
                 <ResultsPerPage
                   perPage={perPage}
-                  values={[5, 10, 20, 30, 50, 100]}
+                  values={[5, 10, 20, 30, 50]}
                   onClick={perPage => this.setState({perPage})}
                 />
               </Grid>

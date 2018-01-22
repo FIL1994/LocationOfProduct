@@ -28,7 +28,6 @@ function renderField(field) {
       <Form.Input
         fluid
         label={field.label}
-        placeholder={field.input.name}
         {...field.input}
         error={Boolean(touched && error)}
       />
@@ -49,7 +48,7 @@ class LngInput extends Component {
     return (
       <Form.Input
         fluid
-        label={"Longitude: "}
+        label="Longitude: "
         {...this.props.input}
       />
     );
@@ -61,7 +60,7 @@ class LatInput extends Component {
     return (
       <Form.Input
         fluid
-        label={"Latitude: "}
+        label="Latitude: "
         {...this.props.input}
       />
     );

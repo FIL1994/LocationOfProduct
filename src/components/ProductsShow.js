@@ -8,7 +8,8 @@ import React, {Component, Fragment} from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
 import _ from 'lodash';
-import {Grid, Pagination, Button, Input, Message, Select, Icon, Image, Card, Divider, Segment, Popup} from 'semantic-ui-react';
+import {Grid, Pagination, Button, Input, Message, Select, Icon, Image, Card, Divider, Popup, Responsive}
+  from 'semantic-ui-react';
 
 import {getProducts, deleteProduct} from '../actions';
 import {formatDate, tryCatch, getStaticMapURL} from '../util';
@@ -177,7 +178,7 @@ class ProductsShow extends Component {
                         Elev: {elevation}
                       </Card.Description>
                     </Card.Content>
-                    <Card.Content extra>
+                    <Card.Content extra style={{cursor: "auto"}}>
                       <div className="ui three buttons">
                         <Button
                           color='teal'
@@ -247,6 +248,13 @@ class ProductsShow extends Component {
       0
     );
 
+    // disallow the activePage to be more than the total pages
+    if(totalPages < activePage) {
+      setTimeout(
+        () => this.setState({activePage: totalPages})
+      );
+    }
+
     // only show pagination if there is more than 1 page
     const productsPagination = totalPages < 2 ? '' :
       (
@@ -273,42 +281,66 @@ class ProductsShow extends Component {
   renderFilterOptions() {
     const {sortAsc} = this.state;
 
-    return(
-      <Grid.Column width={16}>
-        <Input
-          fluid
-          iconPosition="left"
-          placeholder="Search for a product..."
-          action
-        >
-          <Icon name='search'/>
-          <input
-            onChange={(e) => this.onQueryChange(e.target.value)}
-          />
-          <Button as="span" basic content="Sort By:" className="no-hover"/>
-          <Select
-            options={[
-              {key: 'id', text: 'ID', value: '_id'},
-              {key: 'description', text: 'Description', value: 'description'},
-              {key: 'datetime', text: 'Datetime', value: 'datetime'},
-              {key: 'latitude', text: 'Latitude', value: 'latitude'},
-              {key: 'longitude', text: 'Longitude', value: 'longitude'},
-              {key: 'elevation', text: 'Elevation', value: 'elevation'}
-            ]}
-            onChange={
-              (e, select) => {
-                if(this.state.column !== select.value) {
-                  this.setState({column: select.value})
-                }
+    const search = [
+      <Icon key="search-icon" name='search'/>,
+      <input
+        key="search-input"
+        onChange={(e) => this.onQueryChange(e.target.value)}
+      />
+    ];
+    const sort = (
+      <Fragment>
+        <Button as="span" basic content="Sort By:" className="no-hover"/>
+        <Select
+          options={[
+            {key: 'id', text: 'ID', value: '_id'},
+            {key: 'description', text: 'Description', value: 'description'},
+            {key: 'datetime', text: 'Datetime', value: 'datetime'},
+            {key: 'latitude', text: 'Latitude', value: 'latitude'},
+            {key: 'longitude', text: 'Longitude', value: 'longitude'},
+            {key: 'elevation', text: 'Elevation', value: 'elevation'}
+          ]}
+          onChange={
+            (e, select) => {
+              if(this.state.column !== select.value) {
+                this.setState({column: select.value})
               }
             }
-            defaultValue='_id'
-          />
-          <Button icon labelPosition="right" onClick={() => this.setState({sortAsc: !sortAsc})}>
-            <Icon name={sortAsc ? "chevron up": "chevron down"}/>
-            Order
-          </Button>
-        </Input>
+          }
+          defaultValue='_id'
+        />
+        <Button icon labelPosition="right" onClick={() => this.setState({sortAsc: !sortAsc})}>
+          <Icon name={sortAsc ? "chevron up": "chevron down"}/>
+          Order
+        </Button>
+      </Fragment>
+    );
+    const inputProps = {
+      fluid: true,
+      iconPosition: "left",
+      placeholder: "Search for a product..."
+    };
+
+    return(
+      <Grid.Column width={16}>
+        <Responsive
+          minWidth={Responsive.onlyTablet.minWidth}
+          as={Input}
+          {...inputProps}
+          action
+        >
+          {search}
+          {sort}
+        </Responsive>
+        <Responsive maxWidth={Responsive.onlyMobile.maxWidth}>
+          <Input {...inputProps} style={{marginBottom: 5}}>
+            {search}
+          </Input>
+          <Input fluid action style={{justifyContent: "center"}}>
+            <input disabled tabIndex={-1} style={{display: "none"}}/>
+            {sort}
+          </Input>
+        </Responsive>
       </Grid.Column>
     );
   }
@@ -347,7 +379,8 @@ class ProductsShow extends Component {
                 position: "fixed",
                 zIndex: "6",
                 right: "2.5%",
-                bottom: "2.5%"
+                bottom: "2.5%",
+                fontSize: "2rem"
               }}
             />
           }

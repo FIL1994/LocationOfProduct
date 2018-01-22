@@ -32,7 +32,8 @@ export default (props) => {
                       <Form.Input
                         {...field.input}
                         {...inputProps}
-                        label={"Datetime: "}
+                        label="Datetime: "
+                        placeholder="click to pick a date"
                         error={Boolean(touched && error)}
                         onClick={(e) => {
                           inputProps.onClick(e);
